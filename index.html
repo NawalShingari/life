@@ -3,1040 +3,1144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXUS // Life RPG</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>NEXUS — Life OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS — Dark Purple Neon
+═══════════════════════════════════════ */
 :root {
-  --bg-void: #030508;
-  --bg-deep: #060b12;
-  --bg-panel: #0a1220;
-  --bg-card: #0d1928;
-  --bg-hover: #111f35;
-  --neon-cyan: #00f5ff;
-  --neon-blue: #0080ff;
-  --neon-purple: #bf00ff;
-  --neon-pink: #ff006e;
-  --neon-green: #00ff88;
-  --neon-yellow: #ffcc00;
-  --neon-orange: #ff6600;
-  --text-primary: #e8f4ff;
-  --text-secondary: #7090b0;
-  --text-dim: #3a5570;
-  --border-dim: #1a2d45;
-  --border-glow: rgba(0,245,255,0.3);
-  --font-display: 'Orbitron', monospace;
-  --font-mono: 'Share Tech Mono', monospace;
-  --font-body: 'Rajdhani', sans-serif;
+  --void:       #07060f;
+  --depth:      #0c0a1a;
+  --surface:    #110f22;
+  --elevated:   #16132d;
+  --card:       #1c1836;
+  --hover:      #221f40;
+  --border:     #2a2550;
+  --border-mid: #3d3870;
+
+  --purple:     #9b5de5;
+  --purple-dim: #6b3fa0;
+  --purple-glow:rgba(155,93,229,0.25);
+  --violet:     #c77dff;
+  --pink:       #e040fb;
+  --pink-glow:  rgba(224,64,251,0.2);
+  --cyan:       #00f5d4;
+  --cyan-glow:  rgba(0,245,212,0.2);
+  --blue:       #4361ee;
+  --amber:      #ffd60a;
+  --amber-glow: rgba(255,214,10,0.2);
+  --green:      #06d6a0;
+  --red:        #ef233c;
+
+  --text-1: #f0eeff;
+  --text-2: #9994c4;
+  --text-3: #5c5880;
+  --text-4: #3a3660;
+
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --font-body:    'Inter', sans-serif;
+
+  --radius:  8px;
+  --radius-sm: 4px;
+  --radius-lg: 14px;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-
-html { scroll-behavior: smooth; }
-
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:15px; }
 body {
-  background: var(--bg-void);
-  color: var(--text-primary);
+  background: var(--void);
+  color: var(--text-1);
   font-family: var(--font-body);
   min-height: 100vh;
   overflow-x: hidden;
-  background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(0,128,255,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 0%, rgba(191,0,255,0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 100%, rgba(0,245,255,0.04) 0%, transparent 50%);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scanline overlay */
+/* Ambient background */
 body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-  pointer-events: none;
-  z-index: 9999;
+  content:'';
+  position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% -10%, rgba(155,93,229,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 110%, rgba(0,245,212,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(67,97,238,0.04) 0%, transparent 70%);
 }
 
-/* Grid background */
+/* Subtle noise texture */
 body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0,245,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,245,255,0.015) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  z-index: 0;
+  content:'';
+  position:fixed; inset:0; pointer-events:none; z-index:0;
+  opacity:0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
 }
 
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg-void); }
-::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 2px; }
+::-webkit-scrollbar { width:3px; height:3px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border-mid); border-radius:2px; }
 
-/* ─── LAYOUT ─── */
-#app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
+/* ═══════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════ */
+#app { position:relative; z-index:1; display:flex; flex-direction:column; min-height:100vh; }
 
-/* ─── TOP NAV ─── */
-.topnav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
-  background: rgba(6,11,18,0.95);
-  border-bottom: 1px solid var(--border-dim);
-  position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(12px);
+/* ═══════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════ */
+#auth-screen {
+  position:fixed; inset:0; z-index:200;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--void);
+  transition: opacity 0.5s, transform 0.5s;
 }
+#auth-screen.hidden { opacity:0; pointer-events:none; transform:scale(1.03); }
 
-.logo {
+.auth-wrap {
+  width:420px; max-width:90vw;
+  animation: authReveal 0.7s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes authReveal { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.auth-logo {
   font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 4px;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 20px rgba(0,245,255,0.8), 0 0 40px rgba(0,245,255,0.4);
+  font-size:32px; font-weight:800; letter-spacing:2px;
+  color:var(--violet);
+  text-shadow: 0 0 30px rgba(199,125,255,0.5);
+  margin-bottom:4px;
 }
-.logo span { color: var(--text-secondary); font-weight: 400; }
-
-.nav-tabs { display: flex; gap: 4px; }
-
-.nav-tab {
-  padding: 7px 16px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  transition: all 0.2s;
-  background: transparent;
-}
-.nav-tab:hover { color: var(--neon-cyan); border-color: var(--border-dim); background: rgba(0,245,255,0.04); }
-.nav-tab.active {
-  color: var(--neon-cyan);
-  border-color: rgba(0,245,255,0.4);
-  background: rgba(0,245,255,0.07);
-  box-shadow: 0 0 12px rgba(0,245,255,0.15), inset 0 0 8px rgba(0,245,255,0.05);
+.auth-tagline {
+  font-family:var(--font-mono); font-size:11px; color:var(--text-3);
+  letter-spacing:3px; margin-bottom:40px;
 }
 
-.nav-right { display: flex; align-items: center; gap: 16px; }
-
-.player-badge {
-  display: flex; align-items: center; gap: 10px;
-  padding: 6px 14px;
-  background: rgba(0,128,255,0.08);
-  border: 1px solid rgba(0,128,255,0.25);
-  border-radius: 4px;
-}
-.player-lvl {
-  font-family: var(--font-display);
-  font-size: 10px;
-  color: var(--neon-yellow);
-  text-shadow: 0 0 8px rgba(255,204,0,0.6);
-}
-.player-name { font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); }
-
-/* ─── MAIN CONTENT ─── */
-.main { padding: 20px 24px; flex: 1; }
-
-/* ─── SECTIONS ─── */
-.section { display: none; animation: fadeIn 0.3s ease; }
-.section.active { display: block; }
-@keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
-
-/* ─── GRID LAYOUTS ─── */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-/* ─── PANEL / CARD ─── */
-.panel {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-dim);
-  border-radius: 6px;
-  padding: 18px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.3s;
-}
-.panel::before {
-  content: '';
-  position: absolute; top:0; left:0; right:0; height:1px;
-  background: linear-gradient(90deg, transparent, rgba(0,245,255,0.15), transparent);
-}
-.panel:hover { border-color: rgba(0,245,255,0.15); }
-
-.panel-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-dim);
-}
-.panel-title {
-  font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--neon-cyan);
-  text-transform: uppercase;
-}
-.panel-badge {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 2px;
-  background: rgba(0,245,255,0.08);
-  border: 1px solid rgba(0,245,255,0.2);
-  color: var(--neon-cyan);
+.auth-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:32px;
+  box-shadow: 0 0 60px rgba(155,93,229,0.08), 0 24px 48px rgba(0,0,0,0.4);
 }
 
-/* ─── STAT CARDS ─── */
+.auth-tabs {
+  display:flex; gap:2px; margin-bottom:28px;
+  background:var(--depth); border-radius:var(--radius-sm); padding:3px;
+}
+.auth-tab {
+  flex:1; padding:8px; text-align:center;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-3); cursor:pointer; border-radius:var(--radius-sm);
+  transition:all 0.2s;
+}
+.auth-tab.active {
+  background:var(--elevated);
+  color:var(--violet);
+  box-shadow:0 0 12px rgba(199,125,255,0.15);
+}
+
+.auth-form { display:flex; flex-direction:column; gap:16px; }
+
+.form-field { display:flex; flex-direction:column; gap:6px; }
+.form-label { font-family:var(--font-mono); font-size:10px; letter-spacing:2px; color:var(--text-3); text-transform:uppercase; }
+
+.form-input {
+  background:var(--depth);
+  border:1px solid var(--border);
+  color:var(--text-1);
+  font-family:var(--font-mono); font-size:13px;
+  padding:11px 14px;
+  border-radius:var(--radius);
+  outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s;
+  width:100%;
+}
+.form-input:focus {
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px var(--purple-glow);
+}
+.form-input::placeholder { color:var(--text-4); }
+
+select.form-input option { background:var(--depth); }
+
+.auth-btn {
+  padding:13px;
+  background:var(--purple);
+  border:none; border-radius:var(--radius);
+  color:#fff; font-family:var(--font-display); font-size:14px; font-weight:700;
+  letter-spacing:1px; cursor:pointer;
+  transition:all 0.2s;
+  box-shadow:0 0 20px var(--purple-glow);
+  margin-top:6px;
+}
+.auth-btn:hover { background:var(--violet); box-shadow:0 0 30px rgba(199,125,255,0.4); transform:translateY(-1px); }
+
+.auth-error {
+  font-family:var(--font-mono); font-size:11px; color:var(--red);
+  padding:10px 14px; background:rgba(239,35,60,0.08);
+  border:1px solid rgba(239,35,60,0.2); border-radius:var(--radius-sm);
+  display:none;
+}
+.auth-error.show { display:block; }
+
+/* ═══════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════ */
+.topbar {
+  display:flex; align-items:center; gap:16px;
+  padding:0 24px; height:56px;
+  background:rgba(7,6,15,0.9);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  position:sticky; top:0; z-index:100;
+}
+
+.topbar-logo {
+  font-family:var(--font-display); font-size:17px; font-weight:800;
+  color:var(--violet); letter-spacing:2px;
+  text-shadow:0 0 20px rgba(199,125,255,0.4);
+  flex-shrink:0;
+}
+
+.topbar-nav { display:flex; gap:2px; flex:1; justify-content:center; }
+
+.nav-item {
+  padding:7px 14px;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-3); cursor:pointer; border-radius:var(--radius-sm);
+  border:1px solid transparent;
+  transition:all 0.2s; white-space:nowrap;
+}
+.nav-item:hover { color:var(--text-2); background:var(--elevated); }
+.nav-item.active {
+  color:var(--violet); border-color:var(--border-mid);
+  background:rgba(199,125,255,0.07);
+}
+
+.topbar-right { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+
+.user-chip {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 12px;
+  background:var(--elevated); border:1px solid var(--border);
+  border-radius:20px; cursor:pointer; transition:all 0.2s;
+}
+.user-chip:hover { border-color:var(--border-mid); }
+.user-avatar {
+  width:26px; height:26px; border-radius:50%;
+  background:linear-gradient(135deg, var(--purple), var(--cyan));
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-size:11px; font-weight:700; color:#fff;
+}
+.user-name { font-family:var(--font-mono); font-size:11px; color:var(--text-2); }
+
+.level-badge {
+  font-family:var(--font-mono); font-size:10px;
+  padding:4px 10px;
+  background:rgba(255,214,10,0.08); border:1px solid rgba(255,214,10,0.25);
+  border-radius:20px; color:var(--amber);
+}
+
+.logout-btn {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:1px;
+  padding:6px 12px; color:var(--text-3);
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  cursor:pointer; background:transparent; transition:all 0.2s;
+}
+.logout-btn:hover { color:var(--red); border-color:rgba(239,35,60,0.3); }
+
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+.main { padding:24px; max-width:1400px; margin:0 auto; width:100%; }
+.section { display:none; animation:fadeUp 0.3s ease both; }
+.section.active { display:block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.page-title {
+  font-family:var(--font-display); font-size:22px; font-weight:700;
+  color:var(--text-1); margin-bottom:20px;
+  display:flex; align-items:center; gap:12px;
+}
+.page-title-accent { color:var(--violet); }
+
+/* Grid */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.g1-2 { display:grid; grid-template-columns:1fr 2fr; gap:16px; }
+.g2-1 { display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+
+/* ═══════════════════════════════════════
+   CARDS & PANELS
+═══════════════════════════════════════ */
+.card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  position:relative; overflow:hidden;
+  transition:border-color 0.3s;
+}
+.card:hover { border-color:var(--border-mid); }
+.card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(155,93,229,0.3), transparent);
+}
+
+.card-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px;
+}
+.card-title {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:3px;
+  color:var(--text-3); text-transform:uppercase;
+}
+.card-action {
+  font-family:var(--font-mono); font-size:10px; color:var(--purple);
+  cursor:pointer; padding:4px 8px; border-radius:var(--radius-sm);
+  border:1px solid transparent;
+  transition:all 0.2s;
+}
+.card-action:hover { border-color:var(--border-mid); background:var(--elevated); }
+
+/* ═══════════════════════════════════════
+   STAT CARDS
+═══════════════════════════════════════ */
 .stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 6px;
-  padding: 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:18px 20px;
+  position:relative; overflow:hidden; transition:all 0.25s;
 }
+.stat-card:hover { transform:translateY(-2px); border-color:var(--border-mid); }
 .stat-card::after {
-  content: '';
-  position: absolute; bottom:0; left:0; right:0; height:2px;
+  content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+  opacity:0.6;
 }
-.stat-card.cyan::after { background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
-.stat-card.purple::after { background: linear-gradient(90deg, transparent, var(--neon-purple), transparent); }
-.stat-card.pink::after { background: linear-gradient(90deg, transparent, var(--neon-pink), transparent); }
-.stat-card.green::after { background: linear-gradient(90deg, transparent, var(--neon-green), transparent); }
-.stat-card.yellow::after { background: linear-gradient(90deg, transparent, var(--neon-yellow), transparent); }
-.stat-card.orange::after { background: linear-gradient(90deg, transparent, var(--neon-orange), transparent); }
+.sc-purple::after { background:linear-gradient(90deg,transparent,var(--purple),transparent); }
+.sc-cyan::after { background:linear-gradient(90deg,transparent,var(--cyan),transparent); }
+.sc-pink::after { background:linear-gradient(90deg,transparent,var(--pink),transparent); }
+.sc-amber::after { background:linear-gradient(90deg,transparent,var(--amber),transparent); }
+.sc-green::after { background:linear-gradient(90deg,transparent,var(--green),transparent); }
 
-.stat-card:hover { transform: translateY(-2px); border-color: rgba(0,245,255,0.2); }
+.stat-label { font-family:var(--font-mono); font-size:10px; letter-spacing:2px; color:var(--text-3); text-transform:uppercase; margin-bottom:10px; }
+.stat-value { font-family:var(--font-display); font-size:30px; font-weight:700; line-height:1; }
+.sc-purple .stat-value { color:var(--violet); }
+.sc-cyan .stat-value { color:var(--cyan); }
+.sc-pink .stat-value { color:var(--pink); }
+.sc-amber .stat-value { color:var(--amber); }
+.sc-green .stat-value { color:var(--green); }
+.stat-sub { font-family:var(--font-mono); font-size:10px; color:var(--text-3); margin-top:6px; }
 
-.stat-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; }
-.stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 700; }
-.stat-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); margin-top: 4px; }
-
-.cyan .stat-value { color: var(--neon-cyan); text-shadow: 0 0 20px rgba(0,245,255,0.5); }
-.purple .stat-value { color: var(--neon-purple); text-shadow: 0 0 20px rgba(191,0,255,0.5); }
-.pink .stat-value { color: var(--neon-pink); text-shadow: 0 0 20px rgba(255,0,110,0.5); }
-.green .stat-value { color: var(--neon-green); text-shadow: 0 0 20px rgba(0,255,136,0.5); }
-.yellow .stat-value { color: var(--neon-yellow); text-shadow: 0 0 20px rgba(255,204,0,0.5); }
-.orange .stat-value { color: var(--neon-orange); text-shadow: 0 0 20px rgba(255,102,0,0.5); }
-
-/* ─── XP BAR ─── */
-.xp-section {
-  margin-bottom: 20px;
-  padding: 16px 20px;
-  background: rgba(0,128,255,0.05);
-  border: 1px solid rgba(0,128,255,0.2);
-  border-radius: 6px;
-  display: flex; align-items: center; gap: 20px;
+/* ═══════════════════════════════════════
+   XP BAR
+═══════════════════════════════════════ */
+.xp-bar-wrap {
+  padding:20px 24px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-lg); margin-bottom:18px;
+  display:flex; align-items:center; gap:24px;
 }
-.xp-level {
-  font-family: var(--font-display);
-  font-size: 40px;
-  font-weight: 900;
-  color: var(--neon-yellow);
-  text-shadow: 0 0 30px rgba(255,204,0,0.7);
-  min-width: 70px;
-  text-align: center;
+.xp-level-block { text-align:center; min-width:60px; }
+.xp-level-num {
+  font-family:var(--font-display); font-size:36px; font-weight:800;
+  color:var(--amber); text-shadow:0 0 24px var(--amber-glow);
 }
-.xp-level-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 3px; color: var(--text-dim); text-align: center; }
-.xp-info { flex: 1; }
-.xp-title { font-family: var(--font-display); font-size: 14px; color: var(--text-primary); margin-bottom: 8px; }
-.xp-bar-wrap { height: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; border: 1px solid var(--border-dim); overflow: hidden; }
-.xp-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
-  border-radius: 6px;
-  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
-  box-shadow: 0 0 12px rgba(0,245,255,0.6);
-  position: relative;
+.xp-level-label { font-family:var(--font-mono); font-size:9px; letter-spacing:3px; color:var(--text-3); }
+.xp-info { flex:1; }
+.xp-rank { font-family:var(--font-display); font-size:13px; font-weight:600; color:var(--text-1); margin-bottom:10px; }
+.xp-track { height:6px; background:var(--depth); border-radius:3px; overflow:hidden; }
+.xp-fill {
+  height:100%; border-radius:3px;
+  background:linear-gradient(90deg, var(--purple), var(--violet));
+  box-shadow:0 0 12px var(--purple-glow);
+  transition:width 1s cubic-bezier(0.34,1.56,0.64,1);
 }
-.xp-bar-fill::after {
-  content: '';
-  position: absolute; inset:0;
-  background: linear-gradient(90deg, transparent 60%, rgba(255,255,255,0.2));
-  animation: shimmer 2s infinite;
-}
-@keyframes shimmer { 0%,100%{opacity:0} 50%{opacity:1} }
-.xp-numbers { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); margin-top: 5px; }
+.xp-nums { font-family:var(--font-mono); font-size:10px; color:var(--text-3); margin-top:6px; }
+.xp-total-block { text-align:right; }
+.xp-total-val { font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--purple); }
+.xp-total-label { font-family:var(--font-mono); font-size:9px; color:var(--text-3); letter-spacing:2px; }
 
-/* ─── TASKS ─── */
+/* ═══════════════════════════════════════
+   PROGRESS BARS
+═══════════════════════════════════════ */
+.pbar-wrap { height:4px; background:var(--depth); border-radius:2px; overflow:hidden; }
+.pbar-fill { height:100%; border-radius:2px; transition:width 0.6s ease; }
+.pb-purple { background:linear-gradient(90deg,var(--purple),var(--violet)); }
+.pb-cyan { background:linear-gradient(90deg,var(--blue),var(--cyan)); }
+.pb-pink { background:linear-gradient(90deg,var(--purple),var(--pink)); }
+.pb-amber { background:linear-gradient(90deg,#ff9500,var(--amber)); }
+.pb-green { background:linear-gradient(90deg,var(--cyan),var(--green)); }
+
+/* ═══════════════════════════════════════
+   TASKS
+═══════════════════════════════════════ */
 .task-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 4px;
-  margin-bottom: 8px;
-  transition: all 0.25s;
-  cursor: pointer;
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px;
+  background:var(--elevated); border:1px solid transparent;
+  border-radius:var(--radius); margin-bottom:6px;
+  cursor:pointer; transition:all 0.2s; user-select:none;
 }
-.task-item:hover { border-color: rgba(0,245,255,0.2); background: var(--bg-hover); }
-.task-item.done { opacity: 0.5; }
-.task-item.done .task-name { text-decoration: line-through; }
+.task-item:hover { border-color:var(--border); background:var(--hover); }
+.task-item.done { opacity:0.45; }
 
 .task-check {
-  width: 20px; height: 20px;
-  border: 2px solid var(--border-dim);
-  border-radius: 3px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s; flex-shrink: 0;
+  width:18px; height:18px; flex-shrink:0;
+  border:1.5px solid var(--border-mid); border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s;
 }
-.task-check.checked {
-  background: var(--neon-green);
-  border-color: var(--neon-green);
-  box-shadow: 0 0 10px rgba(0,255,136,0.5);
+.task-check.checked { background:var(--purple); border-color:var(--purple); box-shadow:0 0 8px var(--purple-glow); }
+.task-check.checked::after { content:'✓'; font-size:10px; color:#fff; font-weight:700; }
+
+.task-name { flex:1; font-size:13px; color:var(--text-1); font-weight:400; }
+.task-item.done .task-name { text-decoration:line-through; color:var(--text-3); }
+.task-xp { font-family:var(--font-mono); font-size:10px; color:var(--amber); }
+.task-del { color:var(--text-4); cursor:pointer; font-size:16px; line-height:1; padding:2px; transition:color 0.2s; }
+.task-del:hover { color:var(--red); }
+
+.task-cat-tag {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:1px;
+  padding:2px 7px; border-radius:3px;
 }
-.task-check.checked::after { content: '✓'; font-size: 12px; color: var(--bg-void); font-weight: bold; }
+.tct-study { background:rgba(67,97,238,0.15); color:#7b93f5; border:1px solid rgba(67,97,238,0.25); }
+.tct-gym { background:rgba(224,64,251,0.1); color:var(--pink); border:1px solid rgba(224,64,251,0.2); }
+.tct-diet { background:rgba(6,214,160,0.1); color:var(--green); border:1px solid rgba(6,214,160,0.2); }
+.tct-project { background:rgba(155,93,229,0.12); color:var(--violet); border:1px solid rgba(155,93,229,0.2); }
 
-.task-name { flex: 1; font-size: 14px; }
-.task-xp { font-family: var(--font-mono); font-size: 10px; color: var(--neon-yellow); }
-.task-cat {
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px;
-  padding: 2px 6px; border-radius: 2px;
-}
-.task-cat.study { background: rgba(0,128,255,0.15); color: var(--neon-blue); border: 1px solid rgba(0,128,255,0.3); }
-.task-cat.gym { background: rgba(255,0,110,0.12); color: var(--neon-pink); border: 1px solid rgba(255,0,110,0.3); }
-.task-cat.diet { background: rgba(0,255,136,0.1); color: var(--neon-green); border: 1px solid rgba(0,255,136,0.2); }
-.task-cat.project { background: rgba(191,0,255,0.1); color: var(--neon-purple); border: 1px solid rgba(191,0,255,0.25); }
-
-/* ─── PROGRESS BAR ─── */
-.progress-bar-wrap { height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden; }
-.progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
-.progress-bar-fill.cyan { background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); box-shadow: 0 0 8px rgba(0,245,255,0.5); }
-.progress-bar-fill.pink { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink)); box-shadow: 0 0 8px rgba(255,0,110,0.5); }
-.progress-bar-fill.green { background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green)); box-shadow: 0 0 8px rgba(0,255,136,0.5); }
-.progress-bar-fill.purple { background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple)); box-shadow: 0 0 8px rgba(191,0,255,0.5); }
-.progress-bar-fill.yellow { background: linear-gradient(90deg, var(--neon-orange), var(--neon-yellow)); box-shadow: 0 0 8px rgba(255,204,0,0.5); }
-
-/* ─── BUTTONS ─── */
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
 .btn {
-  font-family: var(--font-mono);
-  font-size: 11px; letter-spacing: 2px;
-  padding: 8px 18px;
-  border-radius: 3px;
-  border: 1px solid;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-transform: uppercase;
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:1px; text-transform:uppercase;
+  padding:9px 16px; border-radius:var(--radius-sm); border:1px solid;
+  cursor:pointer; transition:all 0.2s; white-space:nowrap;
 }
-.btn-cyan { border-color: rgba(0,245,255,0.4); color: var(--neon-cyan); background: rgba(0,245,255,0.06); }
-.btn-cyan:hover { background: rgba(0,245,255,0.14); box-shadow: 0 0 15px rgba(0,245,255,0.25); }
-.btn-green { border-color: rgba(0,255,136,0.4); color: var(--neon-green); background: rgba(0,255,136,0.06); }
-.btn-green:hover { background: rgba(0,255,136,0.12); box-shadow: 0 0 15px rgba(0,255,136,0.25); }
-.btn-pink { border-color: rgba(255,0,110,0.4); color: var(--neon-pink); background: rgba(255,0,110,0.06); }
-.btn-pink:hover { background: rgba(255,0,110,0.12); box-shadow: 0 0 15px rgba(255,0,110,0.25); }
-.btn-sm { padding: 5px 12px; font-size: 10px; }
-.btn-full { width: 100%; text-align: center; }
+.btn-primary { background:var(--purple); border-color:var(--purple); color:#fff; box-shadow:0 0 16px var(--purple-glow); }
+.btn-primary:hover { background:var(--violet); box-shadow:0 0 24px rgba(199,125,255,0.35); }
+.btn-ghost { background:transparent; border-color:var(--border); color:var(--text-2); }
+.btn-ghost:hover { border-color:var(--border-mid); color:var(--text-1); background:var(--elevated); }
+.btn-danger { background:transparent; border-color:rgba(239,35,60,0.3); color:var(--red); }
+.btn-danger:hover { background:rgba(239,35,60,0.08); }
+.btn-sm { padding:6px 12px; font-size:10px; }
+.btn-full { width:100%; justify-content:center; }
 
-/* ─── INPUT ─── */
-input, select, textarea {
-  background: rgba(0,0,0,0.4);
-  border: 1px solid var(--border-dim);
-  color: var(--text-primary);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  padding: 8px 12px;
-  border-radius: 3px;
-  outline: none;
-  width: 100%;
-  transition: border-color 0.2s;
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+.modal-backdrop {
+  position:fixed; inset:0; z-index:300;
+  background:rgba(7,6,15,0.85); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.25s;
 }
-input:focus, select:focus, textarea:focus { border-color: rgba(0,245,255,0.4); box-shadow: 0 0 10px rgba(0,245,255,0.1); }
-input[type="number"] { -moz-appearance: textfield; }
-select option { background: var(--bg-deep); }
+.modal-backdrop.open { opacity:1; pointer-events:all; }
 
-/* ─── QUEST CARDS ─── */
-.quest-card {
-  padding: 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 5px;
-  margin-bottom: 10px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.25s;
-}
-.quest-card::before {
-  content: '';
-  position: absolute; left:0; top:0; bottom:0; width:3px;
-}
-.quest-card.daily::before { background: var(--neon-cyan); }
-.quest-card.weekly::before { background: var(--neon-purple); }
-.quest-card.boss::before { background: var(--neon-orange); box-shadow: 0 0 10px var(--neon-orange); }
-.quest-card.completed { opacity: 0.4; }
-.quest-card:hover { border-color: rgba(0,245,255,0.2); }
-
-.quest-title { font-family: var(--font-display); font-size: 13px; margin-bottom: 6px; }
-.quest-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
-.quest-reward { font-family: var(--font-mono); font-size: 11px; color: var(--neon-yellow); }
-.quest-type { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-.quest-card.daily .quest-type { color: var(--neon-cyan); }
-.quest-card.weekly .quest-type { color: var(--neon-purple); }
-.quest-card.boss .quest-type { color: var(--neon-orange); }
-
-/* ─── STREAK ─── */
-.streak-display {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 16px;
-  background: rgba(255,102,0,0.08);
-  border: 1px solid rgba(255,102,0,0.25);
-  border-radius: 5px;
-}
-.streak-icon { font-size: 28px; }
-.streak-count { font-family: var(--font-display); font-size: 32px; font-weight: 900; color: var(--neon-orange); text-shadow: 0 0 20px rgba(255,102,0,0.7); }
-.streak-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary); letter-spacing: 2px; }
-
-/* ─── SUBJECT ROWS ─── */
-.subject-row {
-  padding: 12px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 4px;
-  margin-bottom: 8px;
-  transition: all 0.2s;
-}
-.subject-row:hover { border-color: rgba(0,128,255,0.3); }
-.subject-name { font-family: var(--font-display); font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; color: var(--neon-cyan); }
-.subject-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-.subject-pct { font-family: var(--font-mono); font-size: 12px; }
-
-/* ─── GYM LOG ─── */
-.gym-set {
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 8px; align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-dim);
-}
-.gym-set:last-child { border-bottom: none; }
-.pr-badge {
-  font-family: var(--font-mono); font-size: 9px;
-  padding: 2px 6px; background: rgba(255,204,0,0.15);
-  border: 1px solid rgba(255,204,0,0.4);
-  border-radius: 2px; color: var(--neon-yellow);
-  animation: pulse 2s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-/* ─── NOTIFICATION ─── */
-.notif {
-  position: fixed; top: 70px; right: 20px; z-index: 1000;
-  padding: 14px 20px;
-  background: var(--bg-panel);
-  border: 1px solid var(--neon-green);
-  border-radius: 5px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--neon-green);
-  box-shadow: 0 0 20px rgba(0,255,136,0.3);
-  transform: translateX(120%);
-  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-}
-.notif.show { transform: translateX(0); }
-.notif-xp { color: var(--neon-yellow); font-size: 14px; font-weight: bold; }
-
-/* ─── MODAL ─── */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
 .modal {
-  background: var(--bg-panel);
-  border: 1px solid rgba(0,245,255,0.3);
-  border-radius: 8px;
-  padding: 24px;
-  width: 440px;
-  max-width: 90vw;
-  box-shadow: 0 0 40px rgba(0,245,255,0.1);
-  transform: scale(0.9);
-  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  background:var(--surface); border:1px solid var(--border-mid);
+  border-radius:var(--radius-lg); padding:28px; width:440px; max-width:92vw;
+  box-shadow:0 0 60px rgba(155,93,229,0.12), 0 24px 48px rgba(0,0,0,0.5);
+  transform:scale(0.94) translateY(12px);
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
-.modal-overlay.open .modal { transform: scale(1); }
-.modal-title {
-  font-family: var(--font-display); font-size: 14px; letter-spacing: 2px;
-  color: var(--neon-cyan); margin-bottom: 18px;
+.modal-backdrop.open .modal { transform:scale(1) translateY(0); }
+
+.modal-title { font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--violet); margin-bottom:22px; }
+.modal-row { margin-bottom:14px; }
+.modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; }
+
+/* ═══════════════════════════════════════
+   FORMS
+═══════════════════════════════════════ */
+input, select, textarea {
+  background:var(--depth); border:1px solid var(--border);
+  color:var(--text-1); font-family:var(--font-mono); font-size:13px;
+  padding:10px 13px; border-radius:var(--radius); outline:none; width:100%;
+  transition:border-color 0.2s, box-shadow 0.2s;
 }
-.form-row { margin-bottom: 12px; }
-.form-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 5px; display: block; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
-
-/* ─── CHART CONTAINER ─── */
-.chart-wrap { position: relative; height: 220px; }
-
-/* ─── DIET MACROS ─── */
-.macro-ring { width: 90px; height: 90px; position: relative; }
-.macro-ring svg { transform: rotate(-90deg); }
-.macro-ring .ring-label { position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.macro-ring .ring-val { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
-.macro-ring .ring-unit { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
-
-/* ─── SECTION HEADERS ─── */
-.section-heading {
-  font-family: var(--font-display);
-  font-size: 20px;
-  letter-spacing: 4px;
-  color: var(--text-primary);
-  margin-bottom: 18px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-dim);
-  display: flex; align-items: center; gap: 14px;
+input:focus, select:focus, textarea:focus {
+  border-color:var(--purple); box-shadow:0 0 0 3px var(--purple-glow);
 }
-.section-heading::before {
-  content: '';
-  display: block;
-  width: 4px; height: 24px;
-  background: linear-gradient(180deg, var(--neon-cyan), var(--neon-blue));
-  border-radius: 2px;
+input::placeholder, textarea::placeholder { color:var(--text-4); }
+select option { background:var(--depth); }
+textarea { resize:vertical; }
+input[type=number] { -moz-appearance:textfield; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+
+.field-label { font-family:var(--font-mono); font-size:10px; letter-spacing:2px; color:var(--text-3); text-transform:uppercase; display:block; margin-bottom:6px; }
+
+/* ═══════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════ */
+.calendar-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px;
 }
-
-/* ─── COMPLETION RING ─── */
-.completion-ring { position: relative; display: inline-block; }
-.completion-ring svg { transform: rotate(-90deg); }
-.completion-center {
-  position: absolute; inset:0;
-  display: flex; flex-direction:column;
-  align-items:center; justify-content:center;
+.cal-month { font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--text-1); }
+.cal-nav { display:flex; gap:6px; }
+.cal-nav-btn {
+  width:28px; height:28px; border-radius:50%;
+  background:var(--elevated); border:1px solid var(--border);
+  color:var(--text-2); cursor:pointer; font-size:13px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s;
 }
-.completion-pct { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--neon-cyan); }
-.completion-text { font-family: var(--font-mono); font-size: 8px; color: var(--text-dim); letter-spacing: 1px; }
+.cal-nav-btn:hover { border-color:var(--border-mid); color:var(--violet); }
 
-/* ─── MUSCLE MAP ─── */
-.muscle-tags { display: flex; flex-wrap:wrap; gap: 6px; margin-top: 8px; }
-.muscle-tag {
-  font-family: var(--font-mono); font-size: 10px;
-  padding: 3px 10px;
-  border-radius: 3px; cursor: pointer;
-  border: 1px solid; transition: all 0.2s;
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-dow {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:1px; color:var(--text-4);
+  text-align:center; padding:4px 0; text-transform:uppercase;
 }
-.muscle-tag.chest { border-color: rgba(255,0,110,0.4); color: var(--neon-pink); background: rgba(255,0,110,0.06); }
-.muscle-tag.back { border-color: rgba(0,128,255,0.4); color: var(--neon-blue); background: rgba(0,128,255,0.06); }
-.muscle-tag.legs { border-color: rgba(0,255,136,0.4); color: var(--neon-green); background: rgba(0,255,136,0.06); }
-.muscle-tag.shoulders { border-color: rgba(191,0,255,0.4); color: var(--neon-purple); background: rgba(191,0,255,0.06); }
-.muscle-tag.arms { border-color: rgba(255,204,0,0.4); color: var(--neon-yellow); background: rgba(255,204,0,0.06); }
-.muscle-tag.core { border-color: rgba(0,245,255,0.4); color: var(--neon-cyan); background: rgba(0,245,255,0.06); }
-.muscle-tag.cardio { border-color: rgba(255,102,0,0.4); color: var(--neon-orange); background: rgba(255,102,0,0.06); }
-.muscle-tag.active, .muscle-tag:hover { box-shadow: 0 0 10px currentColor; }
-
-/* ─── LEVEL UP BANNER ─── */
-.levelup-overlay {
-  position: fixed; inset:0; z-index: 900;
-  display: flex; align-items:center; justify-content:center;
-  background: rgba(0,0,0,0.9);
-  opacity:0; pointer-events:none;
-  transition: opacity 0.4s;
+.cal-day {
+  aspect-ratio:1; border-radius:6px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:11px; color:var(--text-3);
+  cursor:pointer; transition:all 0.15s; position:relative;
 }
-.levelup-overlay.show { opacity:1; pointer-events:all; }
-.levelup-box {
-  text-align: center;
-  padding: 40px;
-  border: 2px solid var(--neon-yellow);
-  border-radius: 10px;
-  background: var(--bg-panel);
-  box-shadow: 0 0 60px rgba(255,204,0,0.3);
-  animation: levelPulse 0.6s ease;
+.cal-day:hover { background:var(--elevated); color:var(--text-1); }
+.cal-day.today { color:var(--violet); font-weight:600; }
+.cal-day.today::after {
+  content:''; position:absolute; bottom:4px;
+  width:4px; height:4px; border-radius:50%;
+  background:var(--violet);
 }
-@keyframes levelPulse { 0%{transform:scale(0.5);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-.levelup-text { font-family: var(--font-display); font-size: 40px; color: var(--neon-yellow); text-shadow: 0 0 40px rgba(255,204,0,0.8); }
-.levelup-lvl { font-family: var(--font-display); font-size: 80px; font-weight: 900; color: var(--neon-yellow); text-shadow: 0 0 60px rgba(255,204,0,0.9); }
-
-/* ─── HORIZONTAL DIVIDER ─── */
-.divider { height:1px; background: linear-gradient(90deg, transparent, var(--border-dim), transparent); margin: 16px 0; }
-
-/* ─── EMPTY STATE ─── */
-.empty-state { text-align:center; padding: 30px; color: var(--text-dim); font-family: var(--font-mono); font-size: 12px; }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 900px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: 1fr 1fr; }
-  .grid-2 { grid-template-columns: 1fr; }
-  .gym-set { grid-template-columns: 2fr 1fr 1fr; }
+.cal-day.has-data { color:var(--text-2); }
+.cal-day.has-data::before {
+  content:''; position:absolute; top:4px; right:4px;
+  width:4px; height:4px; border-radius:50%; background:var(--green);
 }
-@media (max-width: 600px) {
-  .topnav { flex-direction: column; gap: 10px; }
-  .nav-tabs { flex-wrap: wrap; justify-content: center; }
-  .grid-4 { grid-template-columns: 1fr 1fr; }
-  .grid-3 { grid-template-columns: 1fr; }
+.cal-day.selected { background:rgba(155,93,229,0.15); color:var(--violet); border:1px solid var(--border-mid); }
+.cal-day.empty { pointer-events:none; }
+.cal-day.full-done::before { background:var(--purple); }
+.cal-day.partial::before { background:var(--amber); }
+
+/* ═══════════════════════════════════════
+   STREAK
+═══════════════════════════════════════ */
+.streak-row { display:flex; align-items:center; gap:10px; padding:14px 18px; background:rgba(255,214,10,0.05); border:1px solid rgba(255,214,10,0.15); border-radius:var(--radius); }
+.streak-fire { font-size:28px; }
+.streak-num { font-family:var(--font-display); font-size:32px; font-weight:800; color:var(--amber); text-shadow:0 0 20px var(--amber-glow); }
+.streak-label { font-family:var(--font-mono); font-size:10px; color:var(--text-3); letter-spacing:2px; }
+
+/* ═══════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════ */
+.chart-wrap { position:relative; }
+
+/* ═══════════════════════════════════════
+   QUESTS
+═══════════════════════════════════════ */
+.quest-item {
+  padding:14px 16px;
+  background:var(--elevated); border:1px solid transparent;
+  border-radius:var(--radius); margin-bottom:8px;
+  position:relative; overflow:hidden; transition:all 0.2s;
 }
+.quest-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; }
+.quest-daily::before { background:var(--cyan); }
+.quest-weekly::before { background:var(--purple); }
+.quest-boss::before { background:var(--amber); }
+.quest-item:hover { border-color:var(--border); }
+.quest-item.done { opacity:0.4; }
+.quest-type { font-family:var(--font-mono); font-size:9px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+.quest-daily .quest-type { color:var(--cyan); }
+.quest-weekly .quest-type { color:var(--purple); }
+.quest-boss .quest-type { color:var(--amber); }
+.quest-title { font-family:var(--font-display); font-size:13px; font-weight:600; margin-bottom:4px; }
+.quest-desc { font-size:12px; color:var(--text-3); margin-bottom:10px; }
+.quest-foot { display:flex; justify-content:space-between; align-items:center; }
+.quest-xp { font-family:var(--font-mono); font-size:11px; color:var(--amber); }
 
-/* ─── TOOLTIP ─── */
-[data-tip] { position: relative; }
-[data-tip]::after {
-  content: attr(data-tip);
-  position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
-  background: var(--bg-deep); border: 1px solid var(--border-dim);
-  color: var(--text-secondary); font-family: var(--font-mono); font-size: 10px;
-  padding: 4px 8px; border-radius: 3px; white-space: nowrap;
-  opacity:0; pointer-events:none; transition: opacity 0.2s;
+/* ═══════════════════════════════════════
+   SUBJECTS / STUDY
+═══════════════════════════════════════ */
+.subject-block {
+  background:var(--elevated); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px; margin-bottom:10px;
+  transition:border-color 0.2s;
 }
-[data-tip]:hover::after { opacity: 1; }
+.subject-block:hover { border-color:var(--border-mid); }
+.subject-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.subject-name { font-family:var(--font-display); font-size:13px; font-weight:600; color:var(--violet); }
+.subject-pct { font-family:var(--font-mono); font-size:11px; color:var(--text-3); }
 
-/* ─── ICON ─── */
-.icon { display:inline-block; font-style:normal; }
-
-/* ─── CALORIE/MEAL ROWS ─── */
-.meal-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 4px;
-  margin-bottom: 6px;
-}
-.meal-name { font-size: 13px; }
-.meal-macros { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
-.meal-del { color: var(--text-dim); cursor: pointer; font-size: 16px; transition: color 0.2s; }
-.meal-del:hover { color: var(--neon-pink); }
-
-/* ─── TOPIC ITEMS ─── */
 .topic-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 3px;
-  margin-bottom: 5px;
-  transition: all 0.2s;
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px;
+  background:var(--card); border-radius:var(--radius-sm);
+  margin-bottom:4px; transition:all 0.2s;
 }
-.topic-item:hover { border-color: rgba(0,128,255,0.3); }
-.topic-name { flex:1; font-size: 13px; }
-.topic-done { text-decoration: line-through; color: var(--text-dim); }
-.topic-rev { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
-.topic-diff { display: flex; gap: 2px; }
-.star { color: var(--text-dim); font-size: 11px; cursor: pointer; transition: color 0.15s; }
-.star.lit { color: var(--neon-yellow); text-shadow: 0 0 6px rgba(255,204,0,0.6); }
+.topic-item:hover { background:var(--hover); }
+.topic-name { flex:1; font-size:12px; }
+.topic-done .topic-name { text-decoration:line-through; color:var(--text-3); }
+.topic-stars { display:flex; gap:1px; }
+.star { font-size:10px; color:var(--text-4); cursor:pointer; transition:color 0.1s; }
+.star.on { color:var(--amber); }
+.topic-rev {
+  font-family:var(--font-mono); font-size:10px; color:var(--text-3);
+  padding:2px 8px; border:1px solid var(--border); border-radius:3px;
+  cursor:pointer; transition:all 0.15s;
+}
+.topic-rev:hover { border-color:var(--purple); color:var(--violet); }
 
-/* ─── EXERCISE LOG ─── */
+/* ═══════════════════════════════════════
+   GYM
+═══════════════════════════════════════ */
 .exercise-block {
-  padding: 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 4px;
-  margin-bottom: 10px;
+  background:var(--elevated); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px; margin-bottom:8px;
 }
-.exercise-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.exercise-name { font-family: var(--font-display); font-size: 12px; letter-spacing: 1px; }
-
-/* ─── DAILY COMPLETION RING ─── */
-.cat-progress {
-  display: flex; align-items: center; gap: 12px;
-  padding: 8px;
+.ex-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.ex-name { font-family:var(--font-display); font-size:13px; font-weight:600; }
+.pr-tag {
+  font-family:var(--font-mono); font-size:9px;
+  padding:2px 8px; background:rgba(255,214,10,0.12);
+  border:1px solid rgba(255,214,10,0.3); border-radius:3px; color:var(--amber);
 }
-.cat-icon { font-size: 20px; width: 30px; text-align: center; }
-.cat-name { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); width: 70px; }
-.cat-bar-wrap { flex:1; }
+.ex-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.ex-stat { text-align:center; background:var(--card); padding:8px; border-radius:6px; }
+.ex-stat-label { font-family:var(--font-mono); font-size:9px; color:var(--text-3); margin-bottom:4px; }
+.ex-stat-val { font-family:var(--font-display); font-size:15px; font-weight:600; }
 
-/* ─── ANALYTICS ─── */
-.analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-
-/* ─── HOVER GLOW ROW ─── */
-.glow-row { transition: box-shadow 0.3s; }
-.glow-row:hover { box-shadow: 0 0 15px rgba(0,245,255,0.08); }
-
-/* corner decorations */
-.panel-corner::before, .panel-corner::after {
-  content: '';
-  position: absolute;
-  width: 10px; height: 10px;
-  border-color: var(--neon-cyan);
-  border-style: solid;
+.muscle-filter { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.mf-tag {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:1px;
+  padding:4px 11px; border-radius:20px; cursor:pointer;
+  border:1px solid var(--border); color:var(--text-3);
+  transition:all 0.15s;
 }
-.panel-corner::before { top: -1px; right: -1px; border-width: 1px 1px 0 0; }
-.panel-corner::after { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
+.mf-tag:hover, .mf-tag.active { border-color:var(--purple); color:var(--violet); background:rgba(155,93,229,0.1); }
+
+/* ═══════════════════════════════════════
+   DIET
+═══════════════════════════════════════ */
+.meal-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px;
+  background:var(--elevated); border:1px solid var(--border);
+  border-radius:var(--radius); margin-bottom:6px;
+}
+.meal-name { font-size:13px; margin-bottom:3px; }
+.meal-macros { font-family:var(--font-mono); font-size:10px; color:var(--text-3); }
+
+/* ═══════════════════════════════════════
+   TIME / CLOCK
+═══════════════════════════════════════ */
+.clock-block {
+  font-family:var(--font-mono); font-size:38px; font-weight:500;
+  color:var(--violet); letter-spacing:4px; line-height:1;
+  text-shadow:0 0 24px var(--purple-glow);
+}
+.date-block { font-family:var(--font-mono); font-size:11px; color:var(--text-3); margin-top:6px; letter-spacing:2px; }
+.day-counter { font-family:var(--font-mono); font-size:10px; color:var(--text-3); margin-top:3px; }
+
+/* ═══════════════════════════════════════
+   WEEK/MONTH TABS
+═══════════════════════════════════════ */
+.period-tabs { display:flex; gap:2px; margin-bottom:16px; background:var(--depth); padding:3px; border-radius:var(--radius-sm); width:fit-content; }
+.period-tab {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  padding:7px 14px; border-radius:var(--radius-sm); cursor:pointer;
+  color:var(--text-3); transition:all 0.2s;
+}
+.period-tab.active { background:var(--elevated); color:var(--violet); }
+
+/* ═══════════════════════════════════════
+   NOTIFICATIONS
+═══════════════════════════════════════ */
+.notif {
+  position:fixed; top:68px; right:20px; z-index:500;
+  padding:12px 18px;
+  background:var(--surface); border:1px solid var(--border-mid);
+  border-radius:var(--radius); font-family:var(--font-mono); font-size:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 20px var(--purple-glow);
+  transform:translateX(130%); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  max-width:300px;
+}
+.notif.show { transform:translateX(0); }
+.notif-xp { color:var(--amber); font-size:13px; font-weight:600; }
+.notif-msg { color:var(--text-2); margin-top:2px; }
+
+/* ═══════════════════════════════════════
+   LEVEL UP
+═══════════════════════════════════════ */
+.levelup-back {
+  position:fixed; inset:0; z-index:400;
+  background:rgba(7,6,15,0.92); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+.levelup-back.show { opacity:1; pointer-events:all; }
+.levelup-box {
+  text-align:center; padding:48px 56px;
+  background:var(--surface); border:1px solid rgba(199,125,255,0.4);
+  border-radius:var(--radius-lg);
+  box-shadow:0 0 80px rgba(155,93,229,0.25), 0 0 160px rgba(155,93,229,0.08);
+}
+.lu-tag { font-family:var(--font-mono); font-size:11px; letter-spacing:4px; color:var(--text-3); margin-bottom:8px; }
+.lu-text { font-family:var(--font-display); font-size:36px; font-weight:800; color:var(--violet); text-shadow:0 0 40px rgba(199,125,255,0.6); }
+.lu-num { font-family:var(--font-display); font-size:80px; font-weight:800; color:var(--amber); text-shadow:0 0 60px var(--amber-glow); line-height:1; }
+.lu-rank { font-family:var(--font-display); font-size:16px; font-weight:600; color:var(--cyan); margin-top:8px; }
+.lu-hint { font-family:var(--font-mono); font-size:10px; color:var(--text-3); margin-top:24px; }
+
+/* ═══════════════════════════════════════
+   TIMING BLOCK
+═══════════════════════════════════════ */
+.timer-wrap {
+  display:flex; flex-direction:column; gap:4px;
+  padding:16px; background:var(--elevated); border:1px solid var(--border);
+  border-radius:var(--radius);
+}
+.timer-label { font-family:var(--font-mono); font-size:10px; color:var(--text-3); letter-spacing:2px; }
+.timer-val { font-family:var(--font-mono); font-size:28px; color:var(--cyan); letter-spacing:3px; }
+.timer-actions { display:flex; gap:8px; margin-top:10px; }
+
+/* ═══════════════════════════════════════
+   EMPTY STATES
+═══════════════════════════════════════ */
+.empty { text-align:center; padding:28px; font-family:var(--font-mono); font-size:12px; color:var(--text-4); }
+
+/* ═══════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════ */
+.divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:16px 0; }
+
+/* ═══════════════════════════════════════
+   SCROLLABLE
+═══════════════════════════════════════ */
+.scrollable { overflow-y:auto; max-height:400px; }
+.scrollable::-webkit-scrollbar { width:2px; }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width:1024px) { .g4{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:1fr 1fr} }
+@media (max-width:768px) {
+  .g2,.g3,.g4,.g1-2,.g2-1{grid-template-columns:1fr}
+  .topbar-nav{display:none}
+  .main{padding:16px}
+  .xp-bar-wrap{flex-direction:column; text-align:center}
+}
+
+/* ═══════════════════════════════════════
+   MISC UTILS
+═══════════════════════════════════════ */
+.flex { display:flex; }
+.flex-center { display:flex; align-items:center; }
+.flex-between { display:flex; align-items:center; justify-content:space-between; }
+.gap-8 { gap:8px; }
+.gap-12 { gap:12px; }
+.mb-16 { margin-bottom:16px; }
+.mb-8 { margin-bottom:8px; }
+.text-mono { font-family:var(--font-mono); }
+.text-dim { color:var(--text-3); }
+.text-violet { color:var(--violet); }
+.text-amber { color:var(--amber); }
+.text-cyan { color:var(--cyan); }
+.text-green { color:var(--green); }
+.text-sm { font-size:12px; }
+.text-xs { font-size:10px; }
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- ─── TOP NAV ─── -->
-<nav class="topnav">
-  <div class="logo">NEXUS<span> // LIFE RPG</span></div>
-  <div class="nav-tabs">
-    <div class="nav-tab active" onclick="showSection('dashboard')">⬡ Dashboard</div>
-    <div class="nav-tab" onclick="showSection('daily')">◈ Daily</div>
-    <div class="nav-tab" onclick="showSection('study')">◎ Study</div>
-    <div class="nav-tab" onclick="showSection('gym')">◆ Gym</div>
-    <div class="nav-tab" onclick="showSection('diet')">◉ Diet</div>
-    <div class="nav-tab" onclick="showSection('quests')">⬟ Quests</div>
-  </div>
-  <div class="nav-right">
-    <div class="player-badge">
-      <div>
-        <div class="player-lvl" id="nav-lvl">LVL 1</div>
-        <div class="player-name">NAWAL</div>
+<!-- ═══════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-wrap">
+    <div class="auth-logo">NEXUS</div>
+    <div class="auth-tagline">// LIFE OPERATING SYSTEM</div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</div>
+        <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</div>
+      </div>
+      <div class="auth-error" id="auth-error"></div>
+      <div class="auth-form" id="login-form">
+        <div class="form-field">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-input" id="login-user" placeholder="your_username" autocomplete="username">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="auth-btn" onclick="doLogin()">Enter System</button>
+      </div>
+      <div class="auth-form" id="register-form" style="display:none">
+        <div class="form-field">
+          <label class="form-label">Display Name</label>
+          <input type="text" class="form-input" id="reg-name" placeholder="Nawal">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-input" id="reg-user" placeholder="nawal_07" autocomplete="username">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="reg-pass" placeholder="Min 6 characters" autocomplete="new-password">
+        </div>
+        <button class="auth-btn" onclick="doRegister()">Create Account</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TOPBAR
+═══════════════════════════════════════ -->
+<nav class="topbar">
+  <div class="topbar-logo">NEXUS</div>
+  <div class="topbar-nav">
+    <div class="nav-item active" onclick="nav('dashboard')">Dashboard</div>
+    <div class="nav-item" onclick="nav('daily')">Daily</div>
+    <div class="nav-item" onclick="nav('study')">Study</div>
+    <div class="nav-item" onclick="nav('gym')">Gym</div>
+    <div class="nav-item" onclick="nav('diet')">Diet</div>
+    <div class="nav-item" onclick="nav('quests')">Quests</div>
+    <div class="nav-item" onclick="nav('analytics')">Analytics</div>
+  </div>
+  <div class="topbar-right">
+    <div class="level-badge" id="topbar-lvl">LVL 1</div>
+    <div class="user-chip" onclick="nav('dashboard')">
+      <div class="user-avatar" id="topbar-avatar">N</div>
+      <span class="user-name" id="topbar-username">—</span>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
   </div>
 </nav>
 
-<!-- ─── MAIN ─── -->
+<!-- ═══════════════════════════════════════
+     MAIN
+═══════════════════════════════════════ -->
 <div class="main">
 
-<!-- ══════════════════════════════════════════
-     DASHBOARD
-══════════════════════════════════════════ -->
-<section id="dashboard" class="section active">
-  <div class="section-heading">COMMAND CENTER</div>
+<!-- ─────────────────── DASHBOARD ─────────────────── -->
+<section id="sec-dashboard" class="section active">
 
-  <!-- XP BAR -->
-  <div class="xp-section" id="xp-section">
-    <div>
-      <div class="xp-level" id="dash-level">1</div>
-      <div class="xp-level-label">LEVEL</div>
-    </div>
-    <div class="xp-info">
-      <div class="xp-title" id="dash-rank">ROOKIE</div>
-      <div class="xp-bar-wrap">
-        <div class="xp-bar-fill" id="xp-fill" style="width:0%"></div>
+  <div class="g2-1" style="margin-bottom:18px; align-items:start">
+    <!-- Left: Clock + Date -->
+    <div class="card" style="padding:24px">
+      <div class="flex-between">
+        <div>
+          <div class="clock-block" id="clock">00:00:00</div>
+          <div class="date-block" id="date-display">—</div>
+          <div class="day-counter" id="day-counter">Day — of the year</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-bottom:4px">WEEK</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--text-2)" id="week-num">W—</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:8px">MONTH</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--text-2)" id="month-display">—</div>
+        </div>
       </div>
-      <div class="xp-numbers" id="xp-nums">0 / 100 XP</div>
     </div>
-    <div style="text-align:right">
-      <div style="font-family:var(--font-display);font-size:22px;color:var(--neon-yellow);text-shadow:0 0 15px rgba(255,204,0,0.6)" id="total-xp-display">0</div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">TOTAL XP</div>
+    <!-- Right: Streak -->
+    <div class="card" style="padding:24px">
+      <div class="card-title" style="margin-bottom:12px">Current Streak</div>
+      <div class="streak-row">
+        <div class="streak-fire">🔥</div>
+        <div>
+          <div class="streak-num" id="dash-streak">0</div>
+          <div class="streak-label">DAYS</div>
+        </div>
+        <div style="margin-left:auto; text-align:right">
+          <div class="text-mono text-xs text-dim">Best</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--amber)" id="dash-best">0</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:5px; margin-top:14px;" id="streak-dots"></div>
     </div>
   </div>
 
-  <!-- STAT CARDS -->
-  <div class="grid-4" style="margin-bottom:16px">
-    <div class="stat-card cyan panel-corner">
-      <div class="stat-label">Streak</div>
-      <div class="stat-value" id="dash-streak">0</div>
-      <div class="stat-sub">days 🔥</div>
+  <!-- XP Bar -->
+  <div class="xp-bar-wrap">
+    <div class="xp-level-block">
+      <div class="xp-level-num" id="dash-level">1</div>
+      <div class="xp-level-label">LEVEL</div>
     </div>
-    <div class="stat-card green">
+    <div class="xp-info">
+      <div class="xp-rank" id="dash-rank">Rookie</div>
+      <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+      <div class="xp-nums" id="xp-nums">0 / 100 XP to next level</div>
+    </div>
+    <div class="xp-total-block">
+      <div class="xp-total-val" id="dash-total-xp">0</div>
+      <div class="xp-total-label">Total XP</div>
+    </div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="g4 mb-16">
+    <div class="stat-card sc-purple">
       <div class="stat-label">Today Done</div>
-      <div class="stat-value" id="dash-done">0%</div>
+      <div class="stat-value" id="dash-pct">0%</div>
       <div class="stat-sub">completion</div>
     </div>
-    <div class="stat-card purple">
+    <div class="stat-card sc-cyan">
       <div class="stat-label">Tasks</div>
       <div class="stat-value" id="dash-tasks">0/0</div>
-      <div class="stat-sub">completed</div>
+      <div class="stat-sub">completed today</div>
     </div>
-    <div class="stat-card yellow">
+    <div class="stat-card sc-amber">
       <div class="stat-label">XP Today</div>
       <div class="stat-value" id="dash-today-xp">0</div>
       <div class="stat-sub">earned</div>
     </div>
+    <div class="stat-card sc-green">
+      <div class="stat-label">Study Topics</div>
+      <div class="stat-value" id="dash-topics">0</div>
+      <div class="stat-sub">completed ever</div>
+    </div>
   </div>
 
-  <div class="grid-2">
-    <!-- Daily Progress -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">TODAY'S PROGRESS</div>
-        <div class="panel-badge" id="daily-date-badge"></div>
-      </div>
-      <div style="display:flex; align-items:center; gap:20px; margin-bottom:14px;">
-        <div class="completion-ring">
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(0,245,255,0.1)" stroke-width="8"/>
-            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--neon-cyan)" stroke-width="8"
-              stroke-linecap="round" id="completion-arc"
-              stroke-dasharray="251.2" stroke-dashoffset="251.2"
-              style="transition:stroke-dashoffset 0.8s ease; filter:drop-shadow(0 0 6px var(--neon-cyan))"/>
-          </svg>
-          <div class="completion-center">
-            <div class="completion-pct" id="completion-pct">0%</div>
-            <div class="completion-text">DONE</div>
-          </div>
-        </div>
-        <div style="flex:1">
-          <div class="cat-progress">
-            <div class="cat-icon">📚</div>
-            <div class="cat-name">Study</div>
-            <div class="cat-bar-wrap">
-              <div class="progress-bar-wrap"><div class="progress-bar-fill cyan" id="study-prog" style="width:0%"></div></div>
-            </div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);width:30px;text-align:right" id="study-prog-pct">0%</div>
-          </div>
-          <div class="cat-progress">
-            <div class="cat-icon">💪</div>
-            <div class="cat-name">Gym</div>
-            <div class="cat-bar-wrap">
-              <div class="progress-bar-wrap"><div class="progress-bar-fill pink" id="gym-prog" style="width:0%"></div></div>
-            </div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);width:30px;text-align:right" id="gym-prog-pct">0%</div>
-          </div>
-          <div class="cat-progress">
-            <div class="cat-icon">🥗</div>
-            <div class="cat-name">Diet</div>
-            <div class="cat-bar-wrap">
-              <div class="progress-bar-wrap"><div class="progress-bar-fill green" id="diet-prog" style="width:0%"></div></div>
-            </div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);width:30px;text-align:right" id="diet-prog-pct">0%</div>
-          </div>
-          <div class="cat-progress">
-            <div class="cat-icon">🚀</div>
-            <div class="cat-name">Project</div>
-            <div class="cat-bar-wrap">
-              <div class="progress-bar-wrap"><div class="progress-bar-fill purple" id="project-prog" style="width:0%"></div></div>
-            </div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);width:30px;text-align:right" id="project-prog-pct">0%</div>
-          </div>
-        </div>
-      </div>
+  <div class="g2">
+    <!-- Category Progress -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Today's Progress</div><div id="today-date-tag" style="font-family:var(--font-mono);font-size:10px;color:var(--text-3)"></div></div>
+      <div id="cat-progress-list"></div>
     </div>
-
-    <!-- XP Chart -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">XP THIS WEEK</div>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="xpChart"></canvas>
-      </div>
+    <!-- Weekly XP Chart -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">This Week</div></div>
+      <div class="chart-wrap" style="height:180px"><canvas id="weekChart"></canvas></div>
     </div>
-
-    <!-- Streak & Active Quests -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">STREAK</div>
-      </div>
-      <div class="streak-display">
-        <div class="streak-icon">🔥</div>
-        <div>
-          <div class="streak-count" id="streak-count">0</div>
-          <div class="streak-label">DAY STREAK</div>
-        </div>
-        <div style="margin-left:auto;text-align:right">
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">Best</div>
-          <div style="font-family:var(--font-display);font-size:20px;color:var(--neon-orange)" id="best-streak">0</div>
+    <!-- Calendar -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Calendar</div></div>
+      <div class="calendar-header">
+        <div class="cal-month" id="cal-month-label">—</div>
+        <div class="cal-nav">
+          <div class="cal-nav-btn" onclick="calPrev()">‹</div>
+          <div class="cal-nav-btn" onclick="calNext()">›</div>
         </div>
       </div>
-      <div style="margin-top:14px">
-        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-secondary);margin-bottom:8px">LAST 7 DAYS</div>
-        <div style="display:flex;gap:5px" id="streak-dots"></div>
-      </div>
+      <div class="cal-grid" id="cal-grid"></div>
     </div>
-
-    <!-- Active Quests mini -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">ACTIVE QUESTS</div>
-        <div class="panel-badge" id="quest-count-badge">0</div>
-      </div>
-      <div id="active-quests-mini"></div>
+    <!-- Active Quests -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Active Quests</div><div class="card-action" onclick="nav('quests')">View All →</div></div>
+      <div id="dash-quests"></div>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     DAILY TRACKER
-══════════════════════════════════════════ -->
-<section id="daily" class="section">
-  <div class="section-heading">DAILY OPERATIONS</div>
-
-  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-    <button class="btn btn-cyan" onclick="openModal('addTaskModal')">+ Add Task</button>
-    <div style="margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);align-self:center">
-      <span id="daily-completion-text">0 / 0 tasks completed</span>
+<!-- ─────────────────── DAILY ─────────────────── -->
+<section id="sec-daily" class="section">
+  <div class="flex-between mb-16">
+    <div class="page-title" style="margin-bottom:0">Daily <span class="page-title-accent">Tasks</span></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('addTaskModal')">+ Add Recurring Task</button>
+    </div>
+  </div>
+  <!-- Timer bar -->
+  <div class="card mb-16" style="padding:16px 20px">
+    <div class="flex-between">
+      <div>
+        <div class="text-mono text-xs text-dim mb-8" style="margin-bottom:4px">FOCUS TIMER</div>
+        <div style="font-family:var(--font-mono);font-size:26px;color:var(--cyan);letter-spacing:3px" id="focus-timer">25:00</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="setTimer(25)">25m</button>
+        <button class="btn btn-ghost btn-sm" onclick="setTimer(45)">45m</button>
+        <button class="btn btn-ghost btn-sm" onclick="setTimer(60)">60m</button>
+        <button class="btn btn-primary btn-sm" id="timer-btn" onclick="toggleTimer()">Start</button>
+      </div>
     </div>
   </div>
 
-  <div class="grid-2">
+  <div class="g2">
     <div>
-      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--neon-blue);margin-bottom:10px">📚 STUDY</div>
-      <div id="tasks-study"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--neon-pink);margin-bottom:10px;margin-top:14px">💪 GYM</div>
-      <div id="tasks-gym"></div>
+      <div class="text-mono text-xs text-dim mb-8" style="margin-bottom:8px;letter-spacing:3px">📚 STUDY</div>
+      <div id="dtasks-study"></div>
+      <div style="margin-top:14px" class="text-mono text-xs text-dim mb-8" style="letter-spacing:3px">💪 GYM</div>
+      <div id="dtasks-gym"></div>
     </div>
     <div>
-      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--neon-green);margin-bottom:10px">🥗 DIET</div>
-      <div id="tasks-diet"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--neon-purple);margin-bottom:10px;margin-top:14px">🚀 PROJECT</div>
-      <div id="tasks-project"></div>
+      <div class="text-mono text-xs text-dim mb-8" style="margin-bottom:8px;letter-spacing:3px">🥗 DIET</div>
+      <div id="dtasks-diet"></div>
+      <div style="margin-top:14px" class="text-mono text-xs text-dim mb-8" style="letter-spacing:3px">🚀 PROJECT</div>
+      <div id="dtasks-project"></div>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     STUDY TRACKER
-══════════════════════════════════════════ -->
-<section id="study" class="section">
-  <div class="section-heading">STUDY MATRIX</div>
-
-  <div style="display:flex;gap:10px;margin-bottom:16px">
-    <button class="btn btn-cyan" onclick="openModal('addSubjectModal')">+ Add Subject</button>
-    <button class="btn btn-cyan" onclick="openModal('addTopicModal')">+ Add Topic</button>
+<!-- ─────────────────── STUDY ─────────────────── -->
+<section id="sec-study" class="section">
+  <div class="flex-between mb-16">
+    <div class="page-title" style="margin-bottom:0">Study <span class="page-title-accent">Matrix</span></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('addSubjectModal')">+ Subject</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('addTopicModal')">+ Topic</button>
+    </div>
   </div>
-
-  <div class="grid-2">
-    <div id="study-subjects"></div>
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">SUBJECT PROGRESS</div></div>
-      <div class="chart-wrap"><canvas id="studyChart"></canvas></div>
+  <div class="g2">
+    <div id="study-list"></div>
+    <div>
+      <div class="card mb-16">
+        <div class="card-header"><div class="card-title">Subject Progress</div></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="studyChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Study Stats</div></div>
+        <div id="study-stats"></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     GYM TRACKER
-══════════════════════════════════════════ -->
-<section id="gym" class="section">
-  <div class="section-heading">GYM PROTOCOL</div>
-
-  <div style="display:flex;gap:10px;margin-bottom:16px">
-    <button class="btn btn-pink" onclick="openModal('logWorkoutModal')">+ Log Exercise</button>
+<!-- ─────────────────── GYM ─────────────────── -->
+<section id="sec-gym" class="section">
+  <div class="flex-between mb-16">
+    <div class="page-title" style="margin-bottom:0">Gym <span class="page-title-accent">Protocol</span></div>
+    <button class="btn btn-primary btn-sm" onclick="openModal('logExerciseModal')">+ Log Exercise</button>
   </div>
-
-  <div class="grid-2">
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">TODAY'S SESSION</div></div>
-      <div style="margin-bottom:12px">
-        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-secondary);margin-bottom:8px">MUSCLE GROUPS</div>
-        <div class="muscle-tags">
-          <span class="muscle-tag chest" onclick="filterMuscle('chest')">Chest</span>
-          <span class="muscle-tag back" onclick="filterMuscle('back')">Back</span>
-          <span class="muscle-tag legs" onclick="filterMuscle('legs')">Legs</span>
-          <span class="muscle-tag shoulders" onclick="filterMuscle('shoulders')">Shoulders</span>
-          <span class="muscle-tag arms" onclick="filterMuscle('arms')">Arms</span>
-          <span class="muscle-tag core" onclick="filterMuscle('core')">Core</span>
-          <span class="muscle-tag cardio" onclick="filterMuscle('cardio')">Cardio</span>
-          <span class="muscle-tag" style="border-color:var(--border-dim);color:var(--text-secondary)" onclick="filterMuscle('all')">All</span>
-        </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Today's Session</div></div>
+      <div class="muscle-filter" id="muscle-filter">
+        <div class="mf-tag active" onclick="setMuscleFilter('all',this)">All</div>
+        <div class="mf-tag" onclick="setMuscleFilter('chest',this)">Chest</div>
+        <div class="mf-tag" onclick="setMuscleFilter('back',this)">Back</div>
+        <div class="mf-tag" onclick="setMuscleFilter('legs',this)">Legs</div>
+        <div class="mf-tag" onclick="setMuscleFilter('shoulders',this)">Shoulders</div>
+        <div class="mf-tag" onclick="setMuscleFilter('arms',this)">Arms</div>
+        <div class="mf-tag" onclick="setMuscleFilter('core',this)">Core</div>
+        <div class="mf-tag" onclick="setMuscleFilter('cardio',this)">Cardio</div>
       </div>
       <div id="gym-log"></div>
     </div>
-
     <div>
-      <div class="panel" style="margin-bottom:16px">
-        <div class="panel-header"><div class="panel-title">VOLUME CHART</div></div>
-        <div class="chart-wrap"><canvas id="gymChart"></canvas></div>
+      <div class="card mb-16">
+        <div class="card-header"><div class="card-title">Volume Split</div></div>
+        <div class="chart-wrap" style="height:180px"><canvas id="gymChart"></canvas></div>
       </div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">PERSONAL RECORDS 🏆</div>
-        </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏆 Personal Records</div></div>
         <div id="pr-list"></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     DIET TRACKER
-══════════════════════════════════════════ -->
-<section id="diet" class="section">
-  <div class="section-heading">NUTRITION PROTOCOL</div>
-
-  <div style="display:flex;gap:10px;margin-bottom:16px">
-    <button class="btn btn-green" onclick="openModal('addMealModal')">+ Log Meal</button>
+<!-- ─────────────────── DIET ─────────────────── -->
+<section id="sec-diet" class="section">
+  <div class="flex-between mb-16">
+    <div class="page-title" style="margin-bottom:0">Nutrition <span class="page-title-accent">Log</span></div>
+    <button class="btn btn-primary btn-sm" onclick="openModal('addMealModal')">+ Log Meal</button>
   </div>
-
-  <div class="grid-2">
+  <div class="g2">
     <div>
-      <div class="panel" style="margin-bottom:16px">
-        <div class="panel-header"><div class="panel-title">MACRO TARGETS</div></div>
-        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-          <div class="macro-ring" id="protein-ring">
-            <svg width="90" height="90" viewBox="0 0 90 90">
-              <circle cx="45" cy="45" r="35" fill="none" stroke="rgba(0,245,255,0.1)" stroke-width="8"/>
-              <circle cx="45" cy="45" r="35" fill="none" stroke="var(--neon-cyan)" stroke-width="8"
-                stroke-linecap="round" id="protein-arc"
-                stroke-dasharray="220" stroke-dashoffset="220"
-                style="transition:stroke-dashoffset 0.8s ease"/>
-            </svg>
-            <div class="ring-label">
-              <div class="ring-val" id="protein-val" style="color:var(--neon-cyan)">0g</div>
-              <div class="ring-unit">protein</div>
-            </div>
-          </div>
-          <div style="flex:1">
-            <div style="margin-bottom:10px">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="font-family:var(--font-mono);font-size:11px;color:var(--neon-cyan)">Protein</span>
-                <span style="font-family:var(--font-mono);font-size:11px" id="protein-status">0g / <span id="protein-goal-display">150</span>g</span>
-              </div>
-              <div class="progress-bar-wrap"><div class="progress-bar-fill cyan" id="protein-bar" style="width:0%"></div></div>
-            </div>
-            <div style="margin-bottom:10px">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="font-family:var(--font-mono);font-size:11px;color:var(--neon-yellow)">Calories</span>
-                <span style="font-family:var(--font-mono);font-size:11px" id="cal-status">0 / <span id="cal-goal-display">2000</span> kcal</span>
-              </div>
-              <div class="progress-bar-wrap"><div class="progress-bar-fill yellow" id="cal-bar" style="width:0%"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="font-family:var(--font-mono);font-size:11px;color:var(--neon-green)">Water</span>
-                <span style="font-family:var(--font-mono);font-size:11px" id="water-status">0L / 3L</span>
-              </div>
-              <div class="progress-bar-wrap"><div class="progress-bar-fill green" id="water-bar" style="width:0%"></div></div>
-            </div>
-          </div>
-        </div>
+      <div class="card mb-16">
+        <div class="card-header"><div class="card-title">Today's Macros</div></div>
+        <div id="macro-bars"></div>
       </div>
-
-      <!-- Meals Log -->
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">MEAL LOG</div>
-          <button class="btn btn-sm btn-green" onclick="openModal('addMealModal')">+ Add</button>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Goals</div>
+          <div class="card-action" onclick="saveDietGoals()">Save</div>
         </div>
-        <div id="meal-log"></div>
+        <div class="modal-row">
+          <label class="field-label">Protein Target (g)</label>
+          <input type="number" id="d-protein-goal" value="150" min="50" max="400">
+        </div>
+        <div class="modal-row">
+          <label class="field-label">Calorie Target (kcal)</label>
+          <input type="number" id="d-cal-goal" value="2000" min="500" max="6000">
+        </div>
+        <div class="modal-row">
+          <label class="field-label">Water Today (L)</label>
+          <input type="number" id="d-water" step="0.1" value="0" min="0" max="10">
+        </div>
       </div>
     </div>
-
     <div>
-      <div class="panel" style="margin-bottom:16px">
-        <div class="panel-header"><div class="panel-title">MACRO SPLIT</div></div>
+      <div class="card mb-16">
+        <div class="card-header"><div class="card-title">Macro Split</div></div>
         <div class="chart-wrap" style="height:180px"><canvas id="macroChart"></canvas></div>
       </div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">PROTEIN GOAL</div>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Daily Protein Target (g)</label>
-          <input type="number" id="protein-goal-input" placeholder="150" value="150" min="50" max="300">
-        </div>
-        <div class="form-row">
-          <label class="form-label">Daily Calorie Target (kcal)</label>
-          <input type="number" id="cal-goal-input" placeholder="2000" value="2000" min="1000" max="5000">
-        </div>
-        <div class="form-row">
-          <label class="form-label">Water Intake (L)</label>
-          <input type="number" id="water-input" step="0.1" placeholder="0" value="0" min="0" max="6">
-        </div>
-        <button class="btn btn-green btn-full" onclick="updateDietGoals()" style="margin-top:8px">Update Goals</button>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Meal Log</div></div>
+        <div id="meal-log"></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     QUESTS
-══════════════════════════════════════════ -->
-<section id="quests" class="section">
-  <div class="section-heading">QUEST BOARD</div>
-
-  <div style="display:flex;gap:10px;margin-bottom:16px">
-    <button class="btn btn-cyan" onclick="openModal('addQuestModal')">+ Custom Quest</button>
+<!-- ─────────────────── QUESTS ─────────────────── -->
+<section id="sec-quests" class="section">
+  <div class="flex-between mb-16">
+    <div class="page-title" style="margin-bottom:0">Quest <span class="page-title-accent">Board</span></div>
+    <button class="btn btn-primary btn-sm" onclick="openModal('addQuestModal')">+ New Quest</button>
   </div>
-
-  <div class="grid-2">
+  <div class="g2">
     <div>
-      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--neon-cyan);margin-bottom:10px">◈ DAILY QUESTS</div>
-      <div id="quest-daily"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--neon-purple);margin-bottom:10px;margin-top:16px">⬟ WEEKLY QUESTS</div>
-      <div id="quest-weekly"></div>
+      <div class="text-mono text-xs text-dim" style="letter-spacing:3px;margin-bottom:10px">◈ DAILY</div>
+      <div id="q-daily"></div>
+      <div class="text-mono text-xs text-dim" style="letter-spacing:3px;margin-bottom:10px;margin-top:18px">⬟ WEEKLY</div>
+      <div id="q-weekly"></div>
     </div>
     <div>
-      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--neon-orange);margin-bottom:10px">💀 BOSS QUESTS</div>
-      <div id="quest-boss"></div>
+      <div class="text-mono text-xs text-dim" style="letter-spacing:3px;margin-bottom:10px">💀 BOSS QUESTS</div>
+      <div id="q-boss"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── ANALYTICS ─────────────────── -->
+<section id="sec-analytics" class="section">
+  <div class="page-title">Analytics <span class="page-title-accent">Overview</span></div>
+  <div class="period-tabs" id="analytics-period-tabs">
+    <div class="period-tab active" onclick="setAnalyticsPeriod('week',this)">Week</div>
+    <div class="period-tab" onclick="setAnalyticsPeriod('month',this)">Month</div>
+    <div class="period-tab" onclick="setAnalyticsPeriod('year',this)">Year</div>
+  </div>
+  <div class="g2 mb-16">
+    <div class="card">
+      <div class="card-header"><div class="card-title">XP Over Time</div></div>
+      <div class="chart-wrap" style="height:200px"><canvas id="xpHistChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Task Completion Rate</div></div>
+      <div class="chart-wrap" style="height:200px"><canvas id="completionChart"></canvas></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="stat-card sc-purple">
+      <div class="stat-label">Total XP</div>
+      <div class="stat-value" id="an-total-xp">0</div>
+    </div>
+    <div class="stat-card sc-amber">
+      <div class="stat-label">Longest Streak</div>
+      <div class="stat-value" id="an-streak">0</div>
+      <div class="stat-sub">days</div>
+    </div>
+    <div class="stat-card sc-green">
+      <div class="stat-label">Topics Mastered</div>
+      <div class="stat-value" id="an-topics">0</div>
+    </div>
+    <div class="stat-card sc-cyan">
+      <div class="stat-label">Meals Logged</div>
+      <div class="stat-value" id="an-meals">0</div>
+    </div>
+    <div class="stat-card sc-pink">
+      <div class="stat-label">Gym Sessions</div>
+      <div class="stat-value" id="an-gym">0</div>
+    </div>
+    <div class="stat-card sc-purple">
+      <div class="stat-label">Quests Done</div>
+      <div class="stat-value" id="an-quests">0</div>
     </div>
   </div>
 </section>
@@ -1044,83 +1148,85 @@ select option { background: var(--bg-deep); }
 </div><!-- /main -->
 </div><!-- /app -->
 
-<!-- ══════════════ MODALS ══════════════ -->
+<!-- ═══════════════════════════════════════
+     MODALS
+═══════════════════════════════════════ -->
 
-<!-- Add Task Modal -->
-<div class="modal-overlay" id="addTaskModal">
+<!-- Add Task -->
+<div class="modal-backdrop" id="addTaskModal">
   <div class="modal">
-    <div class="modal-title">// NEW TASK</div>
-    <div class="form-row">
-      <label class="form-label">Task Name</label>
-      <input type="text" id="task-name-inp" placeholder="e.g. Complete Chapter 3">
+    <div class="modal-title">New Recurring Task</div>
+    <div class="modal-row">
+      <label class="field-label">Task Name</label>
+      <input type="text" id="t-name" placeholder="e.g. Complete Chapter 3">
     </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label class="form-label">Category</label>
-        <select id="task-cat-inp">
+    <div class="modal-grid">
+      <div class="modal-row">
+        <label class="field-label">Category</label>
+        <select id="t-cat">
           <option value="study">Study</option>
           <option value="gym">Gym</option>
           <option value="diet">Diet</option>
           <option value="project">Project</option>
         </select>
       </div>
-      <div class="form-row">
-        <label class="form-label">XP Reward</label>
-        <input type="number" id="task-xp-inp" value="10" min="5" max="100">
+      <div class="modal-row">
+        <label class="field-label">XP Reward</label>
+        <input type="number" id="t-xp" value="10" min="5" max="100">
       </div>
     </div>
-    <div class="form-actions">
-      <button class="btn btn-sm" style="border-color:var(--border-dim);color:var(--text-secondary)" onclick="closeModal('addTaskModal')">Cancel</button>
-      <button class="btn btn-sm btn-cyan" onclick="addTask()">Add Task</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('addTaskModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="addTask()">Add Task</button>
     </div>
   </div>
 </div>
 
-<!-- Add Subject Modal -->
-<div class="modal-overlay" id="addSubjectModal">
+<!-- Add Subject -->
+<div class="modal-backdrop" id="addSubjectModal">
   <div class="modal">
-    <div class="modal-title">// NEW SUBJECT</div>
-    <div class="form-row">
-      <label class="form-label">Subject Name</label>
-      <input type="text" id="subject-name-inp" placeholder="e.g. Data Science">
+    <div class="modal-title">New Subject</div>
+    <div class="modal-row">
+      <label class="field-label">Subject Name</label>
+      <input type="text" id="s-name" placeholder="e.g. Data Science">
     </div>
-    <div class="form-actions">
-      <button class="btn btn-sm" style="border-color:var(--border-dim);color:var(--text-secondary)" onclick="closeModal('addSubjectModal')">Cancel</button>
-      <button class="btn btn-sm btn-cyan" onclick="addSubject()">Add Subject</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('addSubjectModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="addSubject()">Add</button>
     </div>
   </div>
 </div>
 
-<!-- Add Topic Modal -->
-<div class="modal-overlay" id="addTopicModal">
+<!-- Add Topic -->
+<div class="modal-backdrop" id="addTopicModal">
   <div class="modal">
-    <div class="modal-title">// NEW TOPIC</div>
-    <div class="form-row">
-      <label class="form-label">Subject</label>
-      <select id="topic-subject-inp" id="topic-subject-inp"></select>
+    <div class="modal-title">New Topic</div>
+    <div class="modal-row">
+      <label class="field-label">Subject</label>
+      <select id="tp-subject"></select>
     </div>
-    <div class="form-row">
-      <label class="form-label">Topic Name</label>
-      <input type="text" id="topic-name-inp" placeholder="e.g. Linear Regression">
+    <div class="modal-row">
+      <label class="field-label">Topic Name</label>
+      <input type="text" id="tp-name" placeholder="e.g. Linear Regression">
     </div>
-    <div class="form-actions">
-      <button class="btn btn-sm" style="border-color:var(--border-dim);color:var(--text-secondary)" onclick="closeModal('addTopicModal')">Cancel</button>
-      <button class="btn btn-sm btn-cyan" onclick="addTopic()">Add Topic</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('addTopicModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="addTopic()">Add Topic</button>
     </div>
   </div>
 </div>
 
-<!-- Log Workout Modal -->
-<div class="modal-overlay" id="logWorkoutModal">
+<!-- Log Exercise -->
+<div class="modal-backdrop" id="logExerciseModal">
   <div class="modal">
-    <div class="modal-title">// LOG EXERCISE</div>
-    <div class="form-row">
-      <label class="form-label">Exercise Name</label>
-      <input type="text" id="ex-name-inp" placeholder="e.g. Bench Press">
+    <div class="modal-title">Log Exercise</div>
+    <div class="modal-row">
+      <label class="field-label">Exercise Name</label>
+      <input type="text" id="ex-name" placeholder="e.g. Bench Press">
     </div>
-    <div class="form-row">
-      <label class="form-label">Muscle Group</label>
-      <select id="ex-muscle-inp">
+    <div class="modal-row">
+      <label class="field-label">Muscle Group</label>
+      <select id="ex-muscle">
         <option value="chest">Chest</option>
         <option value="back">Back</option>
         <option value="legs">Legs</option>
@@ -1130,156 +1236,165 @@ select option { background: var(--bg-deep); }
         <option value="cardio">Cardio</option>
       </select>
     </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label class="form-label">Sets</label>
-        <input type="number" id="ex-sets-inp" value="3" min="1" max="20">
+    <div class="modal-grid">
+      <div class="modal-row">
+        <label class="field-label">Sets</label>
+        <input type="number" id="ex-sets" value="3" min="1" max="30">
       </div>
-      <div class="form-row">
-        <label class="form-label">Reps</label>
-        <input type="number" id="ex-reps-inp" value="10" min="1" max="100">
+      <div class="modal-row">
+        <label class="field-label">Reps</label>
+        <input type="number" id="ex-reps" value="10" min="1" max="100">
       </div>
     </div>
-    <div class="form-row">
-      <label class="form-label">Weight (kg)</label>
-      <input type="number" id="ex-weight-inp" placeholder="60" min="0" step="0.5">
+    <div class="modal-row">
+      <label class="field-label">Weight (kg) — leave 0 for bodyweight</label>
+      <input type="number" id="ex-weight" value="0" min="0" step="0.5">
     </div>
-    <div class="form-actions">
-      <button class="btn btn-sm" style="border-color:var(--border-dim);color:var(--text-secondary)" onclick="closeModal('logWorkoutModal')">Cancel</button>
-      <button class="btn btn-sm btn-pink" onclick="logExercise()">Log</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('logExerciseModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="logExercise()">Log</button>
     </div>
   </div>
 </div>
 
-<!-- Add Meal Modal -->
-<div class="modal-overlay" id="addMealModal">
+<!-- Add Meal -->
+<div class="modal-backdrop" id="addMealModal">
   <div class="modal">
-    <div class="modal-title">// LOG MEAL</div>
-    <div class="form-row">
-      <label class="form-label">Meal Name</label>
-      <input type="text" id="meal-name-inp" placeholder="e.g. Chicken Rice Bowl">
+    <div class="modal-title">Log Meal</div>
+    <div class="modal-row">
+      <label class="field-label">Meal Name</label>
+      <input type="text" id="m-name" placeholder="e.g. Chicken Rice Bowl">
     </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label class="form-label">Protein (g)</label>
-        <input type="number" id="meal-protein-inp" placeholder="40" min="0">
+    <div class="modal-grid">
+      <div class="modal-row">
+        <label class="field-label">Protein (g)</label>
+        <input type="number" id="m-protein" placeholder="40" min="0">
       </div>
-      <div class="form-row">
-        <label class="form-label">Calories (kcal)</label>
-        <input type="number" id="meal-cal-inp" placeholder="400" min="0">
-      </div>
-    </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label class="form-label">Carbs (g)</label>
-        <input type="number" id="meal-carbs-inp" placeholder="50" min="0">
-      </div>
-      <div class="form-row">
-        <label class="form-label">Fats (g)</label>
-        <input type="number" id="meal-fats-inp" placeholder="10" min="0">
+      <div class="modal-row">
+        <label class="field-label">Calories</label>
+        <input type="number" id="m-cal" placeholder="450" min="0">
       </div>
     </div>
-    <div class="form-actions">
-      <button class="btn btn-sm" style="border-color:var(--border-dim);color:var(--text-secondary)" onclick="closeModal('addMealModal')">Cancel</button>
-      <button class="btn btn-sm btn-green" onclick="addMeal()">Log Meal</button>
+    <div class="modal-grid">
+      <div class="modal-row">
+        <label class="field-label">Carbs (g)</label>
+        <input type="number" id="m-carbs" placeholder="60" min="0">
+      </div>
+      <div class="modal-row">
+        <label class="field-label">Fats (g)</label>
+        <input type="number" id="m-fats" placeholder="12" min="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('addMealModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="addMeal()">Log Meal</button>
     </div>
   </div>
 </div>
 
-<!-- Add Quest Modal -->
-<div class="modal-overlay" id="addQuestModal">
+<!-- Add Quest -->
+<div class="modal-backdrop" id="addQuestModal">
   <div class="modal">
-    <div class="modal-title">// NEW QUEST</div>
-    <div class="form-row">
-      <label class="form-label">Quest Title</label>
-      <input type="text" id="quest-title-inp" placeholder="e.g. Finish DS Module 3">
+    <div class="modal-title">New Quest</div>
+    <div class="modal-row">
+      <label class="field-label">Quest Title</label>
+      <input type="text" id="q-title" placeholder="e.g. Finish DS Module 3">
     </div>
-    <div class="form-row">
-      <label class="form-label">Description</label>
-      <textarea id="quest-desc-inp" placeholder="Quest details..." rows="2" style="resize:none"></textarea>
+    <div class="modal-row">
+      <label class="field-label">Description</label>
+      <textarea id="q-desc" rows="2" placeholder="Details..."></textarea>
     </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label class="form-label">Type</label>
-        <select id="quest-type-inp">
+    <div class="modal-grid">
+      <div class="modal-row">
+        <label class="field-label">Type</label>
+        <select id="q-type">
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
           <option value="boss">Boss Quest</option>
         </select>
       </div>
-      <div class="form-row">
-        <label class="form-label">XP Reward</label>
-        <input type="number" id="quest-xp-inp" value="50" min="10" max="500">
+      <div class="modal-row">
+        <label class="field-label">XP Reward</label>
+        <input type="number" id="q-xp" value="50" min="10" max="1000">
       </div>
     </div>
-    <div class="form-actions">
-      <button class="btn btn-sm" style="border-color:var(--border-dim);color:var(--text-secondary)" onclick="closeModal('addQuestModal')">Cancel</button>
-      <button class="btn btn-sm btn-cyan" onclick="addQuest()">Create Quest</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('addQuestModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="addQuest()">Create Quest</button>
     </div>
   </div>
 </div>
 
-<!-- Level Up Overlay -->
-<div class="levelup-overlay" id="levelup-overlay" onclick="closeLevelUp()">
+<!-- Level Up -->
+<div class="levelup-back" id="lu-back" onclick="closeLevelUp()">
   <div class="levelup-box">
-    <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:4px;color:var(--text-secondary);margin-bottom:8px">◈◈◈ SYSTEM ALERT ◈◈◈</div>
-    <div class="levelup-text">LEVEL UP!</div>
-    <div class="levelup-lvl" id="levelup-num">2</div>
-    <div style="font-family:var(--font-display);font-size:16px;color:var(--neon-cyan);margin-top:8px" id="levelup-rank"></div>
-    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);margin-top:20px">Click to continue</div>
+    <div class="lu-tag">// SYSTEM ALERT //</div>
+    <div class="lu-text">LEVEL UP</div>
+    <div class="lu-num" id="lu-num">2</div>
+    <div class="lu-rank" id="lu-rank">Initiate</div>
+    <div class="lu-hint">Tap to continue</div>
   </div>
 </div>
 
 <!-- Notification -->
-<div class="notif" id="notification">
-  <div id="notif-text"></div>
+<div class="notif" id="notif">
+  <div class="notif-xp" id="notif-xp"></div>
+  <div class="notif-msg" id="notif-msg"></div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  DATABASE — localStorage per-user
+// ═══════════════════════════════════════════════════════════════
 
-const LEVELS = [
-  { min:0, name:'ROOKIE' },
-  { min:100, name:'INITIATE' },
-  { min:250, name:'OPERATIVE' },
-  { min:500, name:'SPECIALIST' },
-  { min:900, name:'EXPERT' },
-  { min:1400, name:'ELITE' },
-  { min:2000, name:'VETERAN' },
-  { min:2800, name:'MASTER' },
-  { min:3800, name:'LEGEND' },
-  { min:5000, name:'APEX' },
-];
+const DB_USERS = 'nexus_users';       // { username: {name,passHash} }
+const DB_STATE = u => `nexus_state_${u}`;
 
-const CAT_XP = { study:10, gym:15, diet:10, project:12 };
+function loadUsers() {
+  try { return JSON.parse(localStorage.getItem(DB_USERS)) || {}; }
+  catch { return {}; }
+}
+function saveUsers(u) { localStorage.setItem(DB_USERS, JSON.stringify(u)); }
 
-let state = load();
+function hashPass(p) {
+  // Simple deterministic hash (no server = no bcrypt, this is local storage)
+  let h = 0;
+  for (let i=0; i<p.length; i++) { h = ((h<<5)-h)+p.charCodeAt(i); h|=0; }
+  return h.toString(36);
+}
 
-function defaultState() {
+function loadState(username) {
+  try { return JSON.parse(localStorage.getItem(DB_STATE(username))) || null; }
+  catch { return null; }
+}
+function saveState() { if (CU) localStorage.setItem(DB_STATE(CU), JSON.stringify(S)); }
+
+// ═══════════════════════════════════════════════════════════════
+//  DEFAULT STATE
+// ═══════════════════════════════════════════════════════════════
+
+function defaultState(name) {
   return {
+    name,
     totalXP: 0,
     todayXP: 0,
-    level: 1,
     streak: 0,
     bestStreak: 0,
-    lastActiveDate: '',
-    weeklyXP: Array(7).fill(0),
-    tasks: [],
+    lastDate: '',
+    weeklyXP: [0,0,0,0,0,0,0],   // [Sun..Sat]
+    dailyXPHistory: {},           // { 'YYYY-MM-DD': xp }
+    dailyDoneHistory: {},         // { 'YYYY-MM-DD': pct }
+    taskTemplates: [],
+    dailyLog: {},                 // { 'YYYY-MM-DD': { taskId: bool } }
     subjects: [
-      { id: 's1', name: 'Data Science', topics: [
+      { id:'s1', name:'Data Science', topics:[
         { id:'t1', name:'Linear Regression', done:false, revCount:0, diff:3 },
         { id:'t2', name:'Decision Trees', done:false, revCount:0, diff:4 },
         { id:'t3', name:'Python Basics', done:true, revCount:2, diff:2 },
       ]},
-      { id: 's2', name: 'Operating Systems', topics: [
-        { id:'t4', name:'Process Management', done:false, revCount:0, diff:3 },
-        { id:'t5', name:'Memory Management', done:false, revCount:1, diff:4 },
-      ]},
-      { id: 's3', name: 'Digital Marketing', topics: [
-        { id:'t6', name:'SEO Fundamentals', done:true, revCount:1, diff:2 },
-        { id:'t7', name:'Social Media Strategy', done:false, revCount:0, diff:2 },
+      { id:'s2', name:'Operating Systems', topics:[
+        { id:'t4', name:'Process Scheduling', done:false, revCount:0, diff:3 },
+        { id:'t5', name:'Memory Management', done:true, revCount:1, diff:4 },
       ]},
     ],
     exercises: [],
@@ -1289,681 +1404,1022 @@ function defaultState() {
     calGoal: 2000,
     waterL: 0,
     quests: [
-      { id:'q1', title:'Daily Grind', desc:'Complete all daily tasks across all categories', type:'daily', xp:50, completed:false },
-      { id:'q2', title:'Perfect Week', desc:'Maintain 100% completion for 7 days straight', type:'weekly', xp:200, completed:false },
-      { id:'q3', title:'Iron Will', desc:'Log gym sessions for 30 consecutive days', type:'boss', xp:500, completed:false },
-      { id:'q4', title:'Scholar', desc:'Complete 10 study topics this month', type:'boss', xp:300, completed:false },
+      { id:'q1', title:'Daily Grind', desc:'Complete all daily tasks', type:'daily', xp:50, done:false },
+      { id:'q2', title:'Perfect Week', desc:'7-day completion streak', type:'weekly', xp:200, done:false },
+      { id:'q3', title:'Iron Protocol', desc:'Log gym 30 days straight', type:'boss', xp:500, done:false },
+      { id:'q4', title:'Scholar Mode', desc:'Complete 10 study topics', type:'boss', xp:300, done:false },
     ],
-    streakHistory: [],
   };
 }
 
-function load() {
-  try { const d = localStorage.getItem('nexus_state'); return d ? JSON.parse(d) : defaultState(); }
-  catch(e) { return defaultState(); }
+// ═══════════════════════════════════════════════════════════════
+//  SESSION
+// ═══════════════════════════════════════════════════════════════
+
+let CU = null;  // current username
+let S  = null;  // current state
+
+// ═══════════════════════════════════════════════════════════════
+//  LEVEL SYSTEM
+// ═══════════════════════════════════════════════════════════════
+
+const RANKS = [
+  {min:0,    name:'Rookie'},
+  {min:100,  name:'Initiate'},
+  {min:250,  name:'Operative'},
+  {min:500,  name:'Specialist'},
+  {min:900,  name:'Expert'},
+  {min:1400, name:'Elite'},
+  {min:2000, name:'Veteran'},
+  {min:2800, name:'Master'},
+  {min:3800, name:'Legend'},
+  {min:5000, name:'Apex'},
+];
+
+function getLvl(xp) {
+  let idx = 0;
+  for (let i=RANKS.length-1; i>=0; i--) { if (xp >= RANKS[i].min) { idx=i; break; } }
+  const lvl = idx+1;
+  const rank = RANKS[idx].name;
+  const prevXP = RANKS[idx].min;
+  const nextXP = idx < RANKS.length-1 ? RANKS[idx+1].min : prevXP+2000;
+  const pct = Math.min(100, Math.round((xp-prevXP)/(nextXP-prevXP)*100));
+  return { lvl, rank, prevXP, nextXP, pct };
 }
-function save() { localStorage.setItem('nexus_state', JSON.stringify(state)); }
 
-// check date & streak
-function checkDate() {
-  const today = new Date().toDateString();
-  if (state.lastActiveDate !== today) {
-    const yesterday = new Date(Date.now()-86400000).toDateString();
-    if (state.lastActiveDate === yesterday) {
-      state.streak++;
-    } else if (state.lastActiveDate && state.lastActiveDate !== today) {
-      state.streak = 0;
-    }
-    state.bestStreak = Math.max(state.bestStreak, state.streak);
-    state.lastActiveDate = today;
-    state.todayXP = 0;
-    // Mark tasks as fresh (don't reset, just flag)
-    save();
-  }
+// ═══════════════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════════════
+
+function switchAuthTab(t) {
+  document.getElementById('tab-login').classList.toggle('active', t==='login');
+  document.getElementById('tab-register').classList.toggle('active', t==='register');
+  document.getElementById('login-form').style.display = t==='login'?'flex':'none';
+  document.getElementById('register-form').style.display = t==='register'?'flex':'none';
+  document.getElementById('auth-error').classList.remove('show');
 }
 
-// ═══════════════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════════════
+function authError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.classList.add('show');
+}
 
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  const tabs = document.querySelectorAll('.nav-tab');
-  const names = ['dashboard','daily','study','gym','diet','quests'];
-  tabs[names.indexOf(id)]?.classList.add('active');
+function doLogin() {
+  const user = document.getElementById('login-user').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  if (!user || !pass) return authError('Fill in all fields.');
+  const users = loadUsers();
+  if (!users[user]) return authError('User not found. Register first.');
+  if (users[user].passHash !== hashPass(pass)) return authError('Wrong password.');
+  startSession(user);
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const user = document.getElementById('reg-user').value.trim().toLowerCase().replace(/\s+/g,'_');
+  const pass = document.getElementById('reg-pass').value;
+  if (!name||!user||!pass) return authError('Fill in all fields.');
+  if (pass.length < 6) return authError('Password must be 6+ characters.');
+  const users = loadUsers();
+  if (users[user]) return authError('Username taken. Try another.');
+  users[user] = { name, passHash: hashPass(pass) };
+  saveUsers(users);
+  startSession(user);
+}
+
+function startSession(username) {
+  CU = username;
+  const users = loadUsers();
+  const existing = loadState(username);
+  S = existing || defaultState(users[username].name);
+  checkDate();
+  addDefaultTasks();
+  hideAuth();
+  updateTopbar();
+  startClock();
   renderAll();
 }
 
-// ═══════════════════════════════════════════════════
+function doLogout() {
+  saveState();
+  CU = null; S = null;
+  document.getElementById('auth-screen').classList.remove('hidden');
+}
+
+function hideAuth() {
+  document.getElementById('auth-screen').classList.add('hidden');
+}
+
+function updateTopbar() {
+  if (!S) return;
+  const info = getLvl(S.totalXP);
+  document.getElementById('topbar-username').textContent = S.name;
+  document.getElementById('topbar-avatar').textContent = S.name[0].toUpperCase();
+  document.getElementById('topbar-lvl').textContent = `LVL ${info.lvl}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DATE HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DAILY RESET
+// ═══════════════════════════════════════════════════════════════
+
+function checkDate() {
+  if (!S) return;
+  const today = todayKey();
+  if (!S.dailyLog) S.dailyLog = {};
+  if (!S.taskTemplates) S.taskTemplates = [];
+  if (!S.dailyXPHistory) S.dailyXPHistory = {};
+  if (!S.dailyDoneHistory) S.dailyDoneHistory = {};
+
+  if (S.lastDate !== today) {
+    // Save yesterday's snapshot
+    if (S.lastDate) {
+      S.dailyXPHistory[S.lastDate] = S.todayXP;
+      const log = S.dailyLog[S.lastDate] || {};
+      const total = S.taskTemplates.length;
+      const done = total ? Object.values(log).filter(Boolean).length : 0;
+      S.dailyDoneHistory[S.lastDate] = total ? Math.round(done/total*100) : 0;
+
+      // Streak check
+      const yDate = new Date(); yDate.setDate(yDate.getDate()-1);
+      const yKey = dateKey(yDate);
+      if (S.lastDate === yKey) {
+        const yDone = S.dailyDoneHistory[S.lastDate] || 0;
+        if (yDone >= 50) S.streak++;
+        else S.streak = 0;
+      } else {
+        S.streak = 0;
+      }
+      S.bestStreak = Math.max(S.bestStreak, S.streak);
+    }
+
+    S.lastDate = today;
+    S.todayXP = 0;
+    S.weeklyXP = S.weeklyXP || [0,0,0,0,0,0,0];
+
+    // Fresh log for today
+    if (!S.dailyLog[today]) {
+      S.dailyLog[today] = {};
+      S.taskTemplates.forEach(t => { S.dailyLog[today][t.id] = false; });
+    }
+    saveState();
+  } else {
+    // Same day — ensure new templates are in today's log
+    if (!S.dailyLog[today]) S.dailyLog[today] = {};
+    S.taskTemplates.forEach(t => {
+      if (!(t.id in S.dailyLog[today])) S.dailyLog[today][t.id] = false;
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  XP
+// ═══════════════════════════════════════════════════════════════
+
+function addXP(amount, label) {
+  const prev = getLvl(S.totalXP);
+  S.totalXP += amount;
+  S.todayXP += amount;
+  const dayIdx = new Date().getDay();
+  S.weeklyXP[dayIdx] = (S.weeklyXP[dayIdx]||0) + amount;
+  const now = getLvl(S.totalXP);
+  if (now.lvl > prev.lvl) { S.level = now.lvl; showLevelUp(now.lvl, now.rank); }
+  saveState();
+  renderDashboard();
+  updateTopbar();
+  notify(`+${amount} XP`, label);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════════════════════
+
+function nav(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`sec-${id}`)?.classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  const ids = ['dashboard','daily','study','gym','diet','quests','analytics'];
+  items[ids.indexOf(id)]?.classList.add('active');
+  // render relevant section
+  const renders = {
+    dashboard: renderDashboard,
+    daily: renderDaily,
+    study: renderStudy,
+    gym: renderGym,
+    diet: renderDiet,
+    quests: renderQuests,
+    analytics: renderAnalytics,
+  };
+  renders[id]?.();
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  MODALS
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
 function openModal(id) {
-  if (id === 'addTopicModal') populateSubjectSelect();
+  if (id==='addTopicModal') {
+    const sel = document.getElementById('tp-subject');
+    sel.innerHTML = S.subjects.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  }
   document.getElementById(id).classList.add('open');
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-// click outside to close
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
 });
 
-// ═══════════════════════════════════════════════════
-//  LEVEL SYSTEM
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════
 
-function getLevelInfo(xp) {
-  let lvl = 1, rank = LEVELS[0].name, nextXP = LEVELS[1].min;
-  for (let i = LEVELS.length-1; i >= 0; i--) {
-    if (xp >= LEVELS[i].min) {
-      lvl = i + 1;
-      rank = LEVELS[i].name;
-      nextXP = i < LEVELS.length-1 ? LEVELS[i+1].min : LEVELS[i].min + 2000;
-      break;
-    }
-  }
-  const prevXP = LEVELS[lvl-1]?.min || 0;
-  const pct = Math.min(100, Math.round((xp - prevXP) / (nextXP - prevXP) * 100));
-  return { lvl, rank, nextXP, prevXP, pct };
-}
-
-function addXP(amount, source) {
-  const prevInfo = getLevelInfo(state.totalXP);
-  state.totalXP += amount;
-  state.todayXP += amount;
-
-  // update weekly
-  const dayIdx = new Date().getDay();
-  state.weeklyXP[dayIdx] = (state.weeklyXP[dayIdx] || 0) + amount;
-
-  const newInfo = getLevelInfo(state.totalXP);
-  if (newInfo.lvl > prevInfo.lvl) {
-    state.level = newInfo.lvl;
-    showLevelUp(newInfo.lvl, newInfo.rank);
-  }
-  save();
-  renderAll();
-  showNotification(`+${amount} XP // ${source}`);
+let notifT;
+function notify(xp, msg) {
+  document.getElementById('notif-xp').textContent = xp;
+  document.getElementById('notif-msg').textContent = msg;
+  const el = document.getElementById('notif');
+  el.classList.add('show');
+  clearTimeout(notifT);
+  notifT = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
 function showLevelUp(lvl, rank) {
-  document.getElementById('levelup-num').textContent = lvl;
-  document.getElementById('levelup-rank').textContent = rank;
-  document.getElementById('levelup-overlay').classList.add('show');
+  document.getElementById('lu-num').textContent = lvl;
+  document.getElementById('lu-rank').textContent = rank;
+  document.getElementById('lu-back').classList.add('show');
 }
-function closeLevelUp() { document.getElementById('levelup-overlay').classList.remove('show'); }
+function closeLevelUp() { document.getElementById('lu-back').classList.remove('show'); }
 
-// ═══════════════════════════════════════════════════
-//  NOTIFICATION
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  CLOCK
+// ═══════════════════════════════════════════════════════════════
 
-let notifTimer;
-function showNotification(msg) {
-  const el = document.getElementById('notification');
-  document.getElementById('notif-text').innerHTML = msg;
-  el.classList.add('show');
-  clearTimeout(notifTimer);
-  notifTimer = setTimeout(() => el.classList.remove('show'), 2800);
+function startClock() {
+  function tick() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const sec = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${h}:${m}:${sec}`;
+
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    document.getElementById('date-display').textContent =
+      `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Day of year
+    const start = new Date(now.getFullYear(),0,0);
+    const diff = now - start;
+    const oneDay = 1000*60*60*24;
+    const dayNum = Math.floor(diff/oneDay);
+    document.getElementById('day-counter').textContent = `Day ${dayNum} of ${now.getFullYear()}`;
+
+    // Week number
+    const onejan = new Date(now.getFullYear(),0,1);
+    const week = Math.ceil((((now-onejan)/86400000)+onejan.getDay()+1)/7);
+    document.getElementById('week-num').textContent = `W${week}`;
+    document.getElementById('month-display').textContent = months[now.getMonth()];
+
+    document.getElementById('today-date-tag').textContent =
+      `${now.getDate()} ${months[now.getMonth()]}`;
+  }
+  tick();
+  setInterval(tick, 1000);
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  FOCUS TIMER
+// ═══════════════════════════════════════════════════════════════
+
+let timerSecs = 25*60, timerRunning = false, timerInterval = null;
+
+function setTimer(mins) {
+  timerSecs = mins*60; timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('timer-btn').textContent = 'Start';
+  document.getElementById('focus-timer').textContent = fmtTime(timerSecs);
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('timer-btn').textContent = 'Resume';
+  } else {
+    timerRunning = true;
+    document.getElementById('timer-btn').textContent = 'Pause';
+    timerInterval = setInterval(() => {
+      timerSecs--;
+      document.getElementById('focus-timer').textContent = fmtTime(timerSecs);
+      if (timerSecs <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        document.getElementById('timer-btn').textContent = 'Start';
+        notify('⏱ Done!', 'Focus session complete');
+        addXP(5, 'Focus session completed');
+      }
+    }, 1000);
+  }
+}
+
+function fmtTime(s) {
+  const m = Math.floor(s/60), sec = s%60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  TASKS
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+
+function addDefaultTasks() {
+  if (S.taskTemplates.length === 0) {
+    const today = todayKey();
+    const defaults = [
+      { name:'Complete 1 Study Topic', cat:'study', xp:10 },
+      { name:'Revise Previous Notes', cat:'study', xp:10 },
+      { name:'Gym Session', cat:'gym', xp:15 },
+      { name:'Hit Protein Goal', cat:'diet', xp:10 },
+      { name:'Drink 3L Water', cat:'diet', xp:8 },
+      { name:'Project Work 30min', cat:'project', xp:12 },
+    ];
+    if (!S.dailyLog[today]) S.dailyLog[today] = {};
+    defaults.forEach(d => {
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      S.taskTemplates.push({ id, ...d });
+      S.dailyLog[today][id] = false;
+    });
+    saveState();
+  }
+}
 
 function addTask() {
-  const name = document.getElementById('task-name-inp').value.trim();
-  const cat = document.getElementById('task-cat-inp').value;
-  const xp = parseInt(document.getElementById('task-xp-inp').value) || CAT_XP[cat];
+  const name = document.getElementById('t-name').value.trim();
+  const cat  = document.getElementById('t-cat').value;
+  const xp   = parseInt(document.getElementById('t-xp').value) || 10;
   if (!name) return;
-  state.tasks.push({ id: Date.now().toString(), name, cat, xp, done: false, date: new Date().toDateString() });
-  save();
+  const today = todayKey();
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  S.taskTemplates.push({ id, name, cat, xp });
+  if (!S.dailyLog[today]) S.dailyLog[today] = {};
+  S.dailyLog[today][id] = false;
+  saveState();
   closeModal('addTaskModal');
-  document.getElementById('task-name-inp').value = '';
-  renderTasks();
-  renderDashboard();
+  document.getElementById('t-name').value = '';
+  renderDaily(); renderDashboard();
 }
 
 function toggleTask(id) {
-  const task = state.tasks.find(t => t.id === id);
+  const today = todayKey();
+  if (!S.dailyLog[today]) S.dailyLog[today] = {};
+  const task = S.taskTemplates.find(t => t.id===id);
   if (!task) return;
-  task.done = !task.done;
-  if (task.done) addXP(task.xp, task.name);
-  else { state.totalXP -= task.xp; state.todayXP -= task.xp; save(); renderAll(); }
-}
-
-function renderTasks() {
-  const cats = ['study','gym','diet','project'];
-  const today = new Date().toDateString();
-  cats.forEach(cat => {
-    const el = document.getElementById(`tasks-${cat}`);
-    if (!el) return;
-    const tasks = state.tasks.filter(t => t.cat === cat && t.date === today);
-    if (!tasks.length) { el.innerHTML = `<div class="empty-state">No ${cat} tasks. Add some!</div>`; return; }
-    el.innerHTML = tasks.map(t => `
-      <div class="task-item ${t.done ? 'done' : ''} glow-row" onclick="toggleTask('${t.id}')">
-        <div class="task-check ${t.done ? 'checked' : ''}"></div>
-        <div class="task-name">${t.name}</div>
-        <span class="task-cat ${cat}">${cat}</span>
-        <span class="task-xp">+${t.xp} XP</span>
-        <span onclick="event.stopPropagation();deleteTask('${t.id}')" style="color:var(--text-dim);cursor:pointer;padding:0 4px;font-size:16px">×</span>
-      </div>
-    `).join('');
-  });
-  updateDailyStats();
+  const was = S.dailyLog[today][id];
+  S.dailyLog[today][id] = !was;
+  if (!was) {
+    addXP(task.xp, task.name);
+  } else {
+    S.totalXP = Math.max(0, S.totalXP - task.xp);
+    S.todayXP = Math.max(0, S.todayXP - task.xp);
+    saveState(); renderDashboard(); updateTopbar();
+  }
+  renderDaily();
 }
 
 function deleteTask(id) {
-  state.tasks = state.tasks.filter(t => t.id !== id);
-  save(); renderTasks(); renderDashboard();
+  S.taskTemplates = S.taskTemplates.filter(t => t.id!==id);
+  const today = todayKey();
+  if (S.dailyLog[today]) delete S.dailyLog[today][id];
+  saveState(); renderDaily(); renderDashboard();
 }
 
-function updateDailyStats() {
-  const today = new Date().toDateString();
-  const todayTasks = state.tasks.filter(t => t.date === today);
-  const done = todayTasks.filter(t => t.done).length;
-  const pct = todayTasks.length ? Math.round(done / todayTasks.length * 100) : 0;
-  const el = document.getElementById('daily-completion-text');
-  if (el) el.textContent = `${done} / ${todayTasks.length} tasks completed`;
-  return { done, total: todayTasks.length, pct };
-}
-
-// ═══════════════════════════════════════════════════
-//  STUDY
-// ═══════════════════════════════════════════════════
-
-function addSubject() {
-  const name = document.getElementById('subject-name-inp').value.trim();
-  if (!name) return;
-  state.subjects.push({ id: Date.now().toString(), name, topics: [] });
-  save(); closeModal('addSubjectModal');
-  document.getElementById('subject-name-inp').value = '';
-  renderStudy();
-}
-
-function populateSubjectSelect() {
-  const sel = document.getElementById('topic-subject-inp');
-  if (sel) sel.innerHTML = state.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-}
-
-function addTopic() {
-  const subId = document.getElementById('topic-subject-inp').value;
-  const name = document.getElementById('topic-name-inp').value.trim();
-  if (!name || !subId) return;
-  const sub = state.subjects.find(s => s.id === subId);
-  if (sub) sub.topics.push({ id: Date.now().toString(), name, done:false, revCount:0, diff:3 });
-  save(); closeModal('addTopicModal');
-  document.getElementById('topic-name-inp').value = '';
-  renderStudy();
-}
-
-function toggleTopic(subId, topicId) {
-  const sub = state.subjects.find(s => s.id === subId);
-  if (!sub) return;
-  const topic = sub.topics.find(t => t.id === topicId);
-  if (!topic) return;
-  topic.done = !topic.done;
-  if (topic.done) addXP(10, `Completed: ${topic.name}`);
-  else { state.totalXP -= 10; save(); renderAll(); }
-  renderStudy(); renderDashboard();
-}
-
-function addRevision(subId, topicId) {
-  const sub = state.subjects.find(s => s.id === subId);
-  const topic = sub?.topics.find(t => t.id === topicId);
-  if (topic) { topic.revCount++; save(); renderStudy(); showNotification('Revision logged! +2 XP'); state.totalXP += 2; save(); }
-}
-
-function setDiff(subId, topicId, diff) {
-  const sub = state.subjects.find(s => s.id === subId);
-  const topic = sub?.topics.find(t => t.id === topicId);
-  if (topic) { topic.diff = diff; save(); renderStudy(); }
-}
-
-function renderStudy() {
-  const el = document.getElementById('study-subjects');
-  if (!el) return;
-  if (!state.subjects.length) { el.innerHTML = '<div class="empty-state">No subjects yet. Add one!</div>'; return; }
-
-  el.innerHTML = state.subjects.map(sub => {
-    const done = sub.topics.filter(t => t.done).length;
-    const pct = sub.topics.length ? Math.round(done / sub.topics.length * 100) : 0;
-    return `
-      <div class="panel" style="margin-bottom:12px">
-        <div class="panel-header">
-          <div class="panel-title">${sub.name}</div>
-          <div class="panel-badge">${done}/${sub.topics.length} • ${pct}%</div>
-        </div>
-        <div class="progress-bar-wrap" style="margin-bottom:12px">
-          <div class="progress-bar-fill cyan" style="width:${pct}%"></div>
-        </div>
-        ${sub.topics.map(t => `
-          <div class="topic-item">
-            <div class="task-check ${t.done ? 'checked' : ''}" onclick="toggleTopic('${sub.id}','${t.id}')" style="cursor:pointer;flex-shrink:0"></div>
-            <div class="topic-name ${t.done ? 'topic-done' : ''}">${t.name}</div>
-            <div class="topic-diff">${[1,2,3,4,5].map(i => `<span class="star ${i<=t.diff?'lit':''}" onclick="setDiff('${sub.id}','${t.id}',${i})">★</span>`).join('')}</div>
-            <div class="topic-rev" onclick="addRevision('${sub.id}','${t.id}')" style="cursor:pointer;padding:2px 6px;border:1px solid var(--border-dim);border-radius:2px;" data-tip="Add revision">↺${t.revCount}</div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }).join('');
-
-  renderStudyChart();
-}
-
-let studyChartInstance = null;
-function renderStudyChart() {
-  const canvas = document.getElementById('studyChart');
-  if (!canvas) return;
-  if (studyChartInstance) studyChartInstance.destroy();
-  const labels = state.subjects.map(s => s.name);
-  const data = state.subjects.map(s => s.topics.length ? Math.round(s.topics.filter(t=>t.done).length/s.topics.length*100) : 0);
-  studyChartInstance = new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{ label: '% Complete', data, backgroundColor: labels.map((_,i) => ['rgba(0,245,255,0.5)','rgba(0,128,255,0.5)','rgba(191,0,255,0.5)','rgba(255,0,110,0.5)'][i%4]), borderColor: ['#00f5ff','#0080ff','#bf00ff','#ff006e'], borderWidth: 1, borderRadius: 3 }]
-    },
-    options: chartDefaults({ max:100, label:'%' })
+function renderDaily() {
+  if (!S) return;
+  const today = todayKey();
+  const log = S.dailyLog[today] || {};
+  ['study','gym','diet','project'].forEach(cat => {
+    const el = document.getElementById(`dtasks-${cat}`);
+    if (!el) return;
+    const tasks = S.taskTemplates.filter(t => t.cat===cat);
+    if (!tasks.length) { el.innerHTML = `<div class="empty">No ${cat} tasks</div>`; return; }
+    el.innerHTML = tasks.map(t => {
+      const done = !!log[t.id];
+      return `<div class="task-item ${done?'done':''}" onclick="toggleTask('${t.id}')">
+        <div class="task-check ${done?'checked':''}"></div>
+        <div class="task-name">${t.name}</div>
+        <span class="task-cat-tag tct-${cat}">${cat}</span>
+        <span class="task-xp">+${t.xp}</span>
+        <span class="task-del" onclick="event.stopPropagation();deleteTask('${t.id}')">×</span>
+      </div>`;
+    }).join('');
   });
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  STUDY
+// ═══════════════════════════════════════════════════════════════
+
+function addSubject() {
+  const name = document.getElementById('s-name').value.trim();
+  if (!name) return;
+  S.subjects.push({ id: Date.now().toString(36), name, topics:[] });
+  saveState(); closeModal('addSubjectModal');
+  document.getElementById('s-name').value = '';
+  renderStudy();
+}
+
+function addTopic() {
+  const sid  = document.getElementById('tp-subject').value;
+  const name = document.getElementById('tp-name').value.trim();
+  if (!name||!sid) return;
+  const sub = S.subjects.find(s => s.id===sid);
+  if (sub) sub.topics.push({ id:Date.now().toString(36)+Math.random().toString(36).slice(2), name, done:false, revCount:0, diff:3 });
+  saveState(); closeModal('addTopicModal');
+  document.getElementById('tp-name').value = '';
+  renderStudy();
+}
+
+function toggleTopic(sid, tid) {
+  const sub = S.subjects.find(s=>s.id===sid);
+  if (!sub) return;
+  const t = sub.topics.find(t=>t.id===tid);
+  if (!t) return;
+  t.done = !t.done;
+  if (t.done) addXP(10, `Completed: ${t.name}`);
+  else { S.totalXP=Math.max(0,S.totalXP-10); S.todayXP=Math.max(0,S.todayXP-10); saveState(); renderDashboard(); updateTopbar(); }
+  renderStudy();
+}
+
+function addRev(sid, tid) {
+  const sub = S.subjects.find(s=>s.id===sid);
+  const t = sub?.topics.find(t=>t.id===tid);
+  if (t) { t.revCount++; saveState(); renderStudy(); addXP(2, 'Revision logged'); }
+}
+
+function setDiff(sid, tid, d) {
+  const sub = S.subjects.find(s=>s.id===sid);
+  const t = sub?.topics.find(t=>t.id===tid);
+  if (t) { t.diff=d; saveState(); renderStudy(); }
+}
+
+let studyChart = null;
+function renderStudy() {
+  if (!S) return;
+  const el = document.getElementById('study-list');
+  if (!el) return;
+  if (!S.subjects.length) { el.innerHTML='<div class="empty">No subjects. Add one!</div>'; return; }
+  el.innerHTML = S.subjects.map(sub => {
+    const done = sub.topics.filter(t=>t.done).length;
+    const pct = sub.topics.length ? Math.round(done/sub.topics.length*100) : 0;
+    return `<div class="subject-block">
+      <div class="subject-head">
+        <span class="subject-name">${sub.name}</span>
+        <span class="subject-pct">${done}/${sub.topics.length} · ${pct}%</span>
+      </div>
+      <div class="pbar-wrap" style="margin-bottom:10px"><div class="pbar-fill pb-purple" style="width:${pct}%"></div></div>
+      ${sub.topics.map(t => `
+        <div class="topic-item ${t.done?'topic-done':''}">
+          <div class="task-check ${t.done?'checked':''}" onclick="toggleTopic('${sub.id}','${t.id}')" style="cursor:pointer;flex-shrink:0"></div>
+          <span class="topic-name">${t.name}</span>
+          <div class="topic-stars">${[1,2,3,4,5].map(i=>`<span class="star ${i<=t.diff?'on':''}" onclick="setDiff('${sub.id}','${t.id}',${i})">★</span>`).join('')}</div>
+          <div class="topic-rev" onclick="addRev('${sub.id}','${t.id}')">↺${t.revCount}</div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  // Study chart
+  const canvas = document.getElementById('studyChart');
+  if (!canvas) return;
+  if (studyChart) studyChart.destroy();
+  const labels = S.subjects.map(s=>s.name);
+  const data = S.subjects.map(s => s.topics.length ? Math.round(s.topics.filter(t=>t.done).length/s.topics.length*100) : 0);
+  studyChart = new Chart(canvas, {
+    type:'bar',
+    data:{ labels, datasets:[{ data, backgroundColor:'rgba(155,93,229,0.4)', borderColor:'#9b5de5', borderWidth:1, borderRadius:4 }] },
+    options: chartOpts({ max:100 })
+  });
+
+  // Stats
+  const statsEl = document.getElementById('study-stats');
+  if (statsEl) {
+    const totalT = S.subjects.reduce((a,s)=>a+s.topics.length,0);
+    const doneT  = S.subjects.reduce((a,s)=>a+s.topics.filter(t=>t.done).length,0);
+    const totalRev = S.subjects.reduce((a,s)=>a+s.topics.reduce((b,t)=>b+t.revCount,0),0);
+    statsEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${[['Subjects',S.subjects.length,'sc-purple'],['Topics',totalT,'sc-cyan'],['Completed',doneT,'sc-green'],['Revisions',totalRev,'sc-amber']].map(([l,v,c])=>`
+          <div class="stat-card ${c}" style="padding:12px">
+            <div class="stat-label">${l}</div>
+            <div class="stat-value" style="font-size:22px">${v}</div>
+          </div>`).join('')}
+      </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  GYM
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
-let gymFilter = 'all';
+let muscleFilter = 'all';
+let gymChart = null;
 
-function filterMuscle(group) {
-  gymFilter = group;
-  document.querySelectorAll('.muscle-tag').forEach(t => t.classList.remove('active'));
+function setMuscleFilter(g, el) {
+  muscleFilter = g;
+  document.querySelectorAll('.mf-tag').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
   renderGym();
 }
 
 function logExercise() {
-  const name = document.getElementById('ex-name-inp').value.trim();
-  const muscle = document.getElementById('ex-muscle-inp').value;
-  const sets = parseInt(document.getElementById('ex-sets-inp').value) || 3;
-  const reps = parseInt(document.getElementById('ex-reps-inp').value) || 10;
-  const weight = parseFloat(document.getElementById('ex-weight-inp').value) || 0;
+  const name   = document.getElementById('ex-name').value.trim();
+  const muscle = document.getElementById('ex-muscle').value;
+  const sets   = parseInt(document.getElementById('ex-sets').value)||3;
+  const reps   = parseInt(document.getElementById('ex-reps').value)||10;
+  const weight = parseFloat(document.getElementById('ex-weight').value)||0;
   if (!name) return;
-
-  const volume = sets * reps * weight;
-  const isPR = !state.prs[name] || weight > state.prs[name];
-  if (weight > 0 && isPR) state.prs[name] = weight;
-
-  state.exercises.push({ id: Date.now().toString(), name, muscle, sets, reps, weight, volume, date: new Date().toDateString(), isPR });
+  const volume = sets*reps*weight;
+  const isPR = weight>0 && (!S.prs[name] || weight>S.prs[name]);
+  if (weight>0 && isPR) S.prs[name] = weight;
+  S.exercises.push({ id:Date.now().toString(36), name, muscle, sets, reps, weight, volume, date:todayKey(), isPR });
   addXP(15, `Gym: ${name}`);
-  save(); closeModal('logWorkoutModal');
-  document.getElementById('ex-name-inp').value = '';
-  document.getElementById('ex-weight-inp').value = '';
+  saveState();
+  closeModal('logExerciseModal');
+  document.getElementById('ex-name').value='';
+  document.getElementById('ex-weight').value='0';
   renderGym();
-  if (isPR && weight > 0) showNotification(`🏆 NEW PR! ${name}: ${weight}kg`);
+  if (isPR && weight>0) notify('🏆 NEW PR!', `${name}: ${weight}kg`);
 }
 
 function renderGym() {
+  if (!S) return;
+  const today = todayKey();
+  let exs = S.exercises.filter(e=>e.date===today);
+  if (muscleFilter!=='all') exs = exs.filter(e=>e.muscle===muscleFilter);
+
   const el = document.getElementById('gym-log');
   if (!el) return;
-  const today = new Date().toDateString();
-  let exs = state.exercises.filter(e => e.date === today);
-  if (gymFilter !== 'all') exs = exs.filter(e => e.muscle === gymFilter);
-  if (!exs.length) { el.innerHTML = '<div class="empty-state">No exercises logged today. Let\'s go! 💪</div>'; }
+  if (!exs.length) { el.innerHTML='<div class="empty">No exercises logged today. Get moving! 💪</div>'; }
   else {
-    el.innerHTML = exs.map(e => `
+    el.innerHTML = exs.map(e=>`
       <div class="exercise-block">
-        <div class="exercise-header">
-          <span class="exercise-name">${e.name}</span>
+        <div class="ex-head">
+          <span class="ex-name">${e.name}</span>
           <div style="display:flex;gap:6px;align-items:center">
-            <span class="muscle-tag ${e.muscle}" style="font-size:9px;padding:2px 6px">${e.muscle}</span>
-            ${e.isPR ? '<span class="pr-badge">PR!</span>' : ''}
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3)">${e.muscle}</span>
+            ${e.isPR?'<span class="pr-tag">PR!</span>':''}
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
-          ${[['Sets',e.sets],['Reps',e.reps],['Weight',e.weight?e.weight+'kg':'BW'],['Volume',e.weight?Math.round(e.volume)+'kg':'—']].map(([l,v]) => `
-            <div style="background:rgba(0,0,0,0.3);padding:6px;border-radius:3px">
-              <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${l}</div>
-              <div style="font-family:var(--font-display);font-size:14px;color:var(--text-primary)">${v}</div>
-            </div>
-          `).join('')}
+        <div class="ex-stats">
+          ${[['Sets',e.sets,'var(--violet)'],['Reps',e.reps,'var(--cyan)'],['Weight',e.weight?e.weight+'kg':'BW','var(--pink)'],['Vol',e.weight?Math.round(e.volume):'—','var(--amber)']].map(([l,v,c])=>`
+            <div class="ex-stat">
+              <div class="ex-stat-label">${l}</div>
+              <div class="ex-stat-val" style="color:${c}">${v}</div>
+            </div>`).join('')}
         </div>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
   // PRs
   const prEl = document.getElementById('pr-list');
   if (prEl) {
-    const prs = Object.entries(state.prs);
-    if (!prs.length) prEl.innerHTML = '<div class="empty-state">Log exercises to track PRs</div>';
-    else prEl.innerHTML = prs.map(([name, w]) => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-card);border:1px solid var(--border-dim);border-radius:3px;margin-bottom:5px">
+    const prs = Object.entries(S.prs);
+    if (!prs.length) { prEl.innerHTML='<div class="empty">Log weighted exercises to track PRs</div>'; }
+    else prEl.innerHTML = prs.map(([name,w])=>`
+      <div class="flex-between" style="padding:8px 0;border-bottom:1px solid var(--border)">
         <span style="font-size:13px">${name}</span>
-        <span style="font-family:var(--font-display);font-size:14px;color:var(--neon-yellow)">${w}kg</span>
-      </div>
-    `).join('');
+        <span style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--amber)">${w}kg</span>
+      </div>`).join('');
   }
 
-  renderGymChart();
-}
-
-let gymChartInstance = null;
-function renderGymChart() {
+  // Gym chart
   const canvas = document.getElementById('gymChart');
   if (!canvas) return;
-  if (gymChartInstance) gymChartInstance.destroy();
-  const muscleCounts = {};
-  state.exercises.forEach(e => { muscleCounts[e.muscle] = (muscleCounts[e.muscle]||0) + e.sets; });
-  const labels = Object.keys(muscleCounts);
-  const data = Object.values(muscleCounts);
-  const colors = { chest:'rgba(255,0,110,0.6)', back:'rgba(0,128,255,0.6)', legs:'rgba(0,255,136,0.6)', shoulders:'rgba(191,0,255,0.6)', arms:'rgba(255,204,0,0.6)', core:'rgba(0,245,255,0.6)', cardio:'rgba(255,102,0,0.6)' };
-  gymChartInstance = new Chart(canvas, {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data, backgroundColor: labels.map(l=>colors[l]||'rgba(100,100,100,0.5)'), borderWidth:0 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7090b0', font:{family:'Share Tech Mono',size:10} } } } }
+  if (gymChart) gymChart.destroy();
+  const mc = {};
+  S.exercises.forEach(e => { mc[e.muscle]=(mc[e.muscle]||0)+e.sets; });
+  const cols = { chest:'rgba(224,64,251,0.5)', back:'rgba(67,97,238,0.5)', legs:'rgba(6,214,160,0.5)', shoulders:'rgba(199,125,255,0.5)', arms:'rgba(255,214,10,0.5)', core:'rgba(0,245,212,0.5)', cardio:'rgba(239,35,60,0.5)' };
+  gymChart = new Chart(canvas, {
+    type:'doughnut',
+    data:{ labels:Object.keys(mc), datasets:[{ data:Object.values(mc), backgroundColor:Object.keys(mc).map(k=>cols[k]||'rgba(100,100,100,0.4)'), borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#9994c4', font:{family:'JetBrains Mono',size:10} } } }, cutout:'60%' }
   });
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 //  DIET
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+
+let macroChart = null;
 
 function addMeal() {
-  const name = document.getElementById('meal-name-inp').value.trim();
-  const protein = parseFloat(document.getElementById('meal-protein-inp').value) || 0;
-  const cal = parseFloat(document.getElementById('meal-cal-inp').value) || 0;
-  const carbs = parseFloat(document.getElementById('meal-carbs-inp').value) || 0;
-  const fats = parseFloat(document.getElementById('meal-fats-inp').value) || 0;
+  const name    = document.getElementById('m-name').value.trim();
+  const protein = parseFloat(document.getElementById('m-protein').value)||0;
+  const cal     = parseFloat(document.getElementById('m-cal').value)||0;
+  const carbs   = parseFloat(document.getElementById('m-carbs').value)||0;
+  const fats    = parseFloat(document.getElementById('m-fats').value)||0;
   if (!name) return;
-  state.meals.push({ id: Date.now().toString(), name, protein, cal, carbs, fats, date: new Date().toDateString() });
-  addXP(10, `Diet: ${name} logged`);
-  save(); closeModal('addMealModal');
-  document.getElementById('meal-name-inp').value = '';
-  ['meal-protein-inp','meal-cal-inp','meal-carbs-inp','meal-fats-inp'].forEach(id => document.getElementById(id).value = '');
+  S.meals.push({ id:Date.now().toString(36), name, protein, cal, carbs, fats, date:todayKey() });
+  addXP(10, `Meal logged: ${name}`);
+  saveState();
+  closeModal('addMealModal');
+  ['m-name','m-protein','m-cal','m-carbs','m-fats'].forEach(id => { document.getElementById(id).value=''; });
   renderDiet();
 }
 
 function deleteMeal(id) {
-  state.meals = state.meals.filter(m => m.id !== id);
-  save(); renderDiet();
+  S.meals = S.meals.filter(m=>m.id!==id);
+  saveState(); renderDiet();
 }
 
-function updateDietGoals() {
-  state.proteinGoal = parseInt(document.getElementById('protein-goal-input').value) || 150;
-  state.calGoal = parseInt(document.getElementById('cal-goal-input').value) || 2000;
-  state.waterL = parseFloat(document.getElementById('water-input').value) || 0;
-  save(); renderDiet();
-  showNotification('Goals updated!');
+function saveDietGoals() {
+  S.proteinGoal = parseInt(document.getElementById('d-protein-goal').value)||150;
+  S.calGoal     = parseInt(document.getElementById('d-cal-goal').value)||2000;
+  S.waterL      = parseFloat(document.getElementById('d-water').value)||0;
+  saveState(); renderDiet();
+  notify('Goals saved', 'Diet targets updated');
 }
 
 function renderDiet() {
-  const today = new Date().toDateString();
-  const meals = state.meals.filter(m => m.date === today);
-  const totalProtein = meals.reduce((a,m) => a+m.protein, 0);
-  const totalCal = meals.reduce((a,m) => a+m.cal, 0);
-  const totalCarbs = meals.reduce((a,m) => a+m.carbs, 0);
-  const totalFats = meals.reduce((a,m) => a+m.fats, 0);
-  const water = state.waterL;
+  if (!S) return;
+  const today = todayKey();
+  const meals = S.meals.filter(m=>m.date===today);
+  const tp = meals.reduce((a,m)=>a+m.protein,0);
+  const tc = meals.reduce((a,m)=>a+m.cal,0);
+  const tcarb = meals.reduce((a,m)=>a+m.carbs,0);
+  const tf = meals.reduce((a,m)=>a+m.fats,0);
 
-  // Update UI
-  const pG = state.proteinGoal, cG = state.calGoal;
-  const pPct = Math.min(100, Math.round(totalProtein/pG*100));
-  const cPct = Math.min(100, Math.round(totalCal/cG*100));
-  const wPct = Math.min(100, Math.round(water/3*100));
+  document.getElementById('d-protein-goal').value = S.proteinGoal;
+  document.getElementById('d-cal-goal').value = S.calGoal;
+  document.getElementById('d-water').value = S.waterL;
 
-  document.getElementById('protein-val').textContent = Math.round(totalProtein)+'g';
-  document.getElementById('protein-status').textContent = `${Math.round(totalProtein)}g / `;
-  document.getElementById('protein-goal-display').textContent = pG;
-  document.getElementById('protein-bar').style.width = pPct+'%';
-  const proteinArc = document.getElementById('protein-arc');
-  if (proteinArc) proteinArc.style.strokeDashoffset = 220 - (220 * pPct/100);
+  const pct = (v, goal) => Math.min(100, Math.round(v/goal*100));
 
-  document.getElementById('cal-status').textContent = `${Math.round(totalCal)} / `;
-  document.getElementById('cal-goal-display').textContent = cG;
-  document.getElementById('cal-bar').style.width = cPct+'%';
-  document.getElementById('water-status').textContent = `${water}L / 3L`;
-  document.getElementById('water-bar').style.width = wPct+'%';
-  document.getElementById('protein-goal-input').value = pG;
-  document.getElementById('cal-goal-input').value = cG;
-  document.getElementById('water-input').value = water;
-
-  // Meal log
-  const mealEl = document.getElementById('meal-log');
-  if (mealEl) {
-    if (!meals.length) mealEl.innerHTML = '<div class="empty-state">No meals logged today</div>';
-    else mealEl.innerHTML = meals.map(m => `
-      <div class="meal-row">
-        <div>
-          <div class="meal-name">${m.name}</div>
-          <div class="meal-macros">${m.protein}g protein • ${m.cal} kcal • ${m.carbs}g carbs • ${m.fats}g fat</div>
+  const mbEl = document.getElementById('macro-bars');
+  if (mbEl) {
+    const rows = [
+      ['Protein', tp, S.proteinGoal, 'g', 'pb-cyan'],
+      ['Calories', tc, S.calGoal, 'kcal', 'pb-amber'],
+      ['Carbs', tcarb, Math.round(S.calGoal*0.45/4), 'g', 'pb-purple'],
+      ['Fats', tf, Math.round(S.calGoal*0.25/9), 'g', 'pb-pink'],
+      ['Water', S.waterL, 3, 'L', 'pb-green'],
+    ];
+    mbEl.innerHTML = rows.map(([l,v,g,u,cls])=>`
+      <div style="margin-bottom:14px">
+        <div class="flex-between mb-8" style="margin-bottom:6px">
+          <span class="text-mono text-xs text-dim">${l}</span>
+          <span class="text-mono text-xs">${v}${u} / ${g}${u}</span>
         </div>
-        <span class="meal-del" onclick="deleteMeal('${m.id}')">×</span>
-      </div>
-    `).join('');
+        <div class="pbar-wrap"><div class="pbar-fill ${cls}" style="width:${pct(v,g)}%"></div></div>
+      </div>`).join('');
   }
 
-  renderMacroChart(totalProtein, totalCarbs, totalFats);
-}
+  const mlEl = document.getElementById('meal-log');
+  if (mlEl) {
+    if (!meals.length) { mlEl.innerHTML='<div class="empty">No meals logged today</div>'; }
+    else mlEl.innerHTML = meals.map(m=>`
+      <div class="meal-item">
+        <div>
+          <div class="meal-name">${m.name}</div>
+          <div class="meal-macros">${m.protein}g P · ${m.cal} kcal · ${m.carbs}g C · ${m.fats}g F</div>
+        </div>
+        <span class="task-del" onclick="deleteMeal('${m.id}')">×</span>
+      </div>`).join('');
+  }
 
-let macroChartInstance = null;
-function renderMacroChart(p, c, f) {
   const canvas = document.getElementById('macroChart');
   if (!canvas) return;
-  if (macroChartInstance) macroChartInstance.destroy();
-  macroChartInstance = new Chart(canvas, {
-    type: 'doughnut',
-    data: {
-      labels: ['Protein','Carbs','Fats'],
-      datasets: [{ data: [Math.max(p,1), Math.max(c,1), Math.max(f,1)], backgroundColor: ['rgba(0,245,255,0.6)','rgba(255,204,0,0.6)','rgba(255,0,110,0.5)'], borderWidth:0 }]
-    },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7090b0', font:{family:'Share Tech Mono',size:10} } } }, cutout:'65%' }
+  if (macroChart) macroChart.destroy();
+  macroChart = new Chart(canvas, {
+    type:'doughnut',
+    data:{ labels:['Protein','Carbs','Fats'], datasets:[{ data:[Math.max(tp,1),Math.max(tcarb,1),Math.max(tf,1)], backgroundColor:['rgba(0,245,212,0.5)','rgba(155,93,229,0.5)','rgba(224,64,251,0.5)'], borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ labels:{ color:'#9994c4', font:{family:'JetBrains Mono',size:10} } } } }
   });
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 //  QUESTS
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
 function addQuest() {
-  const title = document.getElementById('quest-title-inp').value.trim();
-  const desc = document.getElementById('quest-desc-inp').value.trim();
-  const type = document.getElementById('quest-type-inp').value;
-  const xp = parseInt(document.getElementById('quest-xp-inp').value) || 50;
+  const title = document.getElementById('q-title').value.trim();
+  const desc  = document.getElementById('q-desc').value.trim();
+  const type  = document.getElementById('q-type').value;
+  const xp    = parseInt(document.getElementById('q-xp').value)||50;
   if (!title) return;
-  state.quests.push({ id: Date.now().toString(), title, desc, type, xp, completed:false });
-  save(); closeModal('addQuestModal');
-  document.getElementById('quest-title-inp').value = '';
-  document.getElementById('quest-desc-inp').value = '';
+  S.quests.push({ id:Date.now().toString(36), title, desc, type, xp, done:false });
+  saveState(); closeModal('addQuestModal');
+  document.getElementById('q-title').value='';
+  document.getElementById('q-desc').value='';
   renderQuests();
 }
 
 function completeQuest(id) {
-  const q = state.quests.find(q => q.id === id);
-  if (!q || q.completed) return;
-  q.completed = true;
+  const q = S.quests.find(q=>q.id===id);
+  if (!q||q.done) return;
+  q.done = true;
   addXP(q.xp, `Quest: ${q.title}`);
-  save(); renderQuests(); renderDashboard();
+  saveState(); renderQuests(); renderDashboard();
 }
 
 function renderQuests() {
+  if (!S) return;
   ['daily','weekly','boss'].forEach(type => {
-    const el = document.getElementById(`quest-${type}`);
+    const el = document.getElementById(`q-${type}`);
     if (!el) return;
-    const quests = state.quests.filter(q => q.type === type);
-    if (!quests.length) { el.innerHTML = '<div class="empty-state">No quests. Add some!</div>'; return; }
-    el.innerHTML = quests.map(q => `
-      <div class="quest-card ${type} ${q.completed ? 'completed' : ''}">
-        <div class="quest-type">${type === 'boss' ? '💀 BOSS' : type === 'weekly' ? '⬟ WEEKLY' : '◈ DAILY'}</div>
+    const qs = S.quests.filter(q=>q.type===type);
+    if (!qs.length) { el.innerHTML='<div class="empty">No quests</div>'; return; }
+    el.innerHTML = qs.map(q=>`
+      <div class="quest-item quest-${type} ${q.done?'done':''}">
+        <div class="quest-type">${type==='boss'?'💀 BOSS':type==='weekly'?'⬟ WEEKLY':'◈ DAILY'}</div>
         <div class="quest-title">${q.title}</div>
         <div class="quest-desc">${q.desc}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="quest-reward">+${q.xp} XP</div>
-          ${q.completed ? '<span style="font-family:var(--font-mono);font-size:10px;color:var(--neon-green)">✓ COMPLETED</span>' : `<button class="btn btn-sm btn-cyan" onclick="completeQuest('${q.id}')">Complete</button>`}
+        <div class="quest-foot">
+          <span class="quest-xp">+${q.xp} XP</span>
+          ${q.done?'<span class="text-mono text-xs text-green">✓ Complete</span>':`<button class="btn btn-primary btn-sm" onclick="completeQuest('${q.id}')">Complete</button>`}
         </div>
-      </div>
-    `).join('');
+      </div>`).join('');
   });
-
-  // mini for dashboard
-  const miniEl = document.getElementById('active-quests-mini');
-  if (miniEl) {
-    const active = state.quests.filter(q => !q.completed).slice(0,3);
-    if (!active.length) { miniEl.innerHTML = '<div class="empty-state">All quests complete! 🎉</div>'; return; }
-    miniEl.innerHTML = active.map(q => `
-      <div style="padding:8px 10px;background:var(--bg-card);border:1px solid var(--border-dim);border-radius:4px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-family:var(--font-display);font-size:11px;margin-bottom:2px">${q.title}</div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)">${q.type} • +${q.xp}xp</div>
-        </div>
-        <button class="btn btn-sm btn-cyan" onclick="completeQuest('${q.id}');renderAll()">✓</button>
-      </div>
-    `).join('');
-    document.getElementById('quest-count-badge').textContent = active.length;
-  }
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════════════════════════
+
+let calYear, calMonth;
+
+function initCal() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  renderCal();
+}
+
+function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); }
+function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); }
+
+function renderCal() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = `${months[calMonth]} ${calYear}`;
+  const grid = document.getElementById('cal-grid');
+  if (!grid) return;
+
+  const dows = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const first = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date();
+
+  let html = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  // Empty cells before first
+  for (let i=0;i<first;i++) html += '<div class="cal-day empty"></div>';
+
+  for (let d=1;d<=daysInMonth;d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = d===today.getDate() && calMonth===today.getMonth() && calYear===today.getFullYear();
+    const pct = S?.dailyDoneHistory?.[dateStr];
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (pct !== undefined) {
+      cls += ' has-data';
+      if (pct >= 100) cls += ' full-done';
+      else if (pct >= 50) cls += ' partial';
+    }
+    html += `<div class="${cls}" title="${pct!==undefined?pct+'% done':''}">${d}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ANALYTICS
+// ═══════════════════════════════════════════════════════════════
+
+let xpHistChart = null, completionChartInst = null;
+let analyticsPeriod = 'week';
+
+function setAnalyticsPeriod(p, el) {
+  analyticsPeriod = p;
+  document.querySelectorAll('#analytics-period-tabs .period-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderAnalytics();
+}
+
+function renderAnalytics() {
+  if (!S) return;
+
+  document.getElementById('an-total-xp').textContent = S.totalXP;
+  document.getElementById('an-streak').textContent = S.bestStreak;
+  document.getElementById('an-topics').textContent = S.subjects?.reduce((a,s)=>a+s.topics.filter(t=>t.done).length,0)||0;
+  document.getElementById('an-meals').textContent = S.meals?.length||0;
+  document.getElementById('an-gym').textContent = [...new Set(S.exercises?.map(e=>e.date)||[])].length;
+  document.getElementById('an-quests').textContent = S.quests?.filter(q=>q.done).length||0;
+
+  // Build date range
+  const now = new Date();
+  let days = 7;
+  if (analyticsPeriod==='month') days=30;
+  if (analyticsPeriod==='year') days=365;
+
+  const labels=[], xpData=[], doneData=[];
+  for (let i=days-1;i>=0;i--) {
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    const key = dateKey(d);
+    labels.push(i===0?'Today':`${d.getDate()}/${d.getMonth()+1}`);
+    xpData.push(S.dailyXPHistory?.[key]||0);
+    doneData.push(S.dailyDoneHistory?.[key]||0);
+  }
+
+  const xpC = document.getElementById('xpHistChart');
+  const doneC = document.getElementById('completionChart');
+  if (!xpC||!doneC) return;
+
+  if (xpHistChart) xpHistChart.destroy();
+  xpHistChart = new Chart(xpC, {
+    type:'line',
+    data:{ labels, datasets:[{ data:xpData, borderColor:'#9b5de5', backgroundColor:'rgba(155,93,229,0.08)', fill:true, tension:0.4, pointRadius:2, pointBackgroundColor:'#9b5de5' }] },
+    options: chartOpts({ label:'XP', noLegend:true })
+  });
+
+  if (completionChartInst) completionChartInst.destroy();
+  completionChartInst = new Chart(doneC, {
+    type:'bar',
+    data:{ labels, datasets:[{ data:doneData, backgroundColor:'rgba(0,245,212,0.3)', borderColor:'#00f5d4', borderWidth:1, borderRadius:3 }] },
+    options: chartOpts({ max:100, label:'%', noLegend:true })
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  DASHBOARD
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+
+let weekChartInst = null;
 
 function renderDashboard() {
-  const info = getLevelInfo(state.totalXP);
+  if (!S) return;
+  const info = getLvl(S.totalXP);
 
-  // Update nav level
-  document.getElementById('nav-lvl').textContent = `LVL ${info.lvl}`;
-
-  // XP bar
   document.getElementById('dash-level').textContent = info.lvl;
   document.getElementById('dash-rank').textContent = info.rank;
-  document.getElementById('xp-fill').style.width = info.pct + '%';
-  document.getElementById('xp-nums').textContent = `${state.totalXP} / ${info.nextXP} XP`;
-  document.getElementById('total-xp-display').textContent = state.totalXP;
+  document.getElementById('xp-fill').style.width = info.pct+'%';
+  document.getElementById('xp-nums').textContent = `${S.totalXP} / ${info.nextXP} XP · ${info.pct}% to next level`;
+  document.getElementById('dash-total-xp').textContent = S.totalXP;
+  document.getElementById('dash-streak').textContent = S.streak;
+  document.getElementById('dash-best').textContent = S.bestStreak;
 
-  // Streak
-  document.getElementById('dash-streak').textContent = state.streak;
-  document.getElementById('streak-count').textContent = state.streak;
-  document.getElementById('best-streak').textContent = state.bestStreak;
+  const today = todayKey();
+  const log = S.dailyLog?.[today] || {};
+  const total = S.taskTemplates?.length || 0;
+  const done  = Object.values(log).filter(Boolean).length;
+  const pct   = total ? Math.round(done/total*100) : 0;
 
-  // Date
-  const dateBadge = document.getElementById('daily-date-badge');
-  if (dateBadge) dateBadge.textContent = new Date().toLocaleDateString('en-IN', {day:'numeric',month:'short'});
-
-  // Tasks stats
-  const today = new Date().toDateString();
-  const todayTasks = state.tasks.filter(t => t.date === today);
-  const doneTasks = todayTasks.filter(t => t.done);
-  const totalPct = todayTasks.length ? Math.round(doneTasks.length / todayTasks.length * 100) : 0;
-
-  document.getElementById('dash-done').textContent = totalPct + '%';
-  document.getElementById('dash-tasks').textContent = `${doneTasks.length}/${todayTasks.length}`;
-  document.getElementById('dash-today-xp').textContent = state.todayXP;
-
-  // Completion ring
-  const arc = document.getElementById('completion-arc');
-  if (arc) arc.style.strokeDashoffset = 251.2 - (251.2 * totalPct / 100);
-  const pctEl = document.getElementById('completion-pct');
-  if (pctEl) pctEl.textContent = totalPct + '%';
+  document.getElementById('dash-pct').textContent = pct+'%';
+  document.getElementById('dash-tasks').textContent = `${done}/${total}`;
+  document.getElementById('dash-today-xp').textContent = S.todayXP;
+  document.getElementById('dash-topics').textContent = S.subjects?.reduce((a,s)=>a+s.topics.filter(t=>t.done).length,0)||0;
 
   // Category progress
-  ['study','gym','diet','project'].forEach(cat => {
-    const tasks = todayTasks.filter(t => t.cat === cat);
-    const pct = tasks.length ? Math.round(tasks.filter(t=>t.done).length / tasks.length * 100) : 0;
-    const bar = document.getElementById(`${cat}-prog`);
-    const label = document.getElementById(`${cat}-prog-pct`);
-    if (bar) bar.style.width = pct + '%';
-    if (label) label.textContent = pct + '%';
-  });
+  const cpEl = document.getElementById('cat-progress-list');
+  if (cpEl) {
+    const cats = [['study','📚','pb-cyan'],['gym','💪','pb-pink'],['diet','🥗','pb-green'],['project','🚀','pb-purple']];
+    cpEl.innerHTML = cats.map(([cat,icon,cls])=>{
+      const ct = S.taskTemplates.filter(t=>t.cat===cat);
+      const cd = ct.filter(t=>!!log[t.id]).length;
+      const cp = ct.length ? Math.round(cd/ct.length*100) : 0;
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:16px;width:24px">${icon}</span>
+        <span class="text-mono text-xs text-dim" style="width:60px;text-transform:capitalize">${cat}</span>
+        <div style="flex:1"><div class="pbar-wrap"><div class="pbar-fill ${cls}" style="width:${cp}%"></div></div></div>
+        <span class="text-mono text-xs text-dim" style="width:32px;text-align:right">${cp}%</span>
+      </div>`;
+    }).join('');
+  }
 
   // Streak dots
   const dotsEl = document.getElementById('streak-dots');
   if (dotsEl) {
-    dotsEl.innerHTML = Array(7).fill(0).map((_, i) => {
-      const active = i < (state.streak % 7 || (state.streak > 0 ? 7 : 0));
-      return `<div style="width:28px;height:28px;border-radius:50%;background:${active ? 'var(--neon-orange)' : 'var(--border-dim)'};box-shadow:${active ? '0 0 10px rgba(255,102,0,0.6)' : 'none'};transition:all 0.3s"></div>`;
+    dotsEl.innerHTML = Array(7).fill(0).map((_,i)=>{
+      const lit = i < Math.min(S.streak%7||(S.streak>0?7:0), 7);
+      return `<div style="flex:1;height:5px;border-radius:3px;background:${lit?'var(--amber)':'var(--border)'};transition:all 0.4s;${lit?'box-shadow:0 0 6px var(--amber-glow)':''}"></div>`;
     }).join('');
   }
 
-  renderXPChart();
+  // Week chart
+  const wc = document.getElementById('weekChart');
+  if (wc) {
+    if (weekChartInst) weekChartInst.destroy();
+    const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const todayDay = new Date().getDay();
+    weekChartInst = new Chart(wc, {
+      type:'bar',
+      data:{ labels:dows, datasets:[{ data:S.weeklyXP||[0,0,0,0,0,0,0], backgroundColor:dows.map((_,i)=>i===todayDay?'rgba(155,93,229,0.5)':'rgba(155,93,229,0.2)'), borderColor:dows.map((_,i)=>i===todayDay?'#9b5de5':'rgba(155,93,229,0.3)'), borderWidth:1, borderRadius:3 }] },
+      options: chartOpts({ label:'XP', noLegend:true })
+    });
+  }
+
+  // Active quests mini
+  const qEl = document.getElementById('dash-quests');
+  if (qEl) {
+    const active = S.quests?.filter(q=>!q.done).slice(0,3)||[];
+    if (!active.length) { qEl.innerHTML='<div class="empty">All quests done! 🎉</div>'; }
+    else qEl.innerHTML = active.map(q=>`
+      <div class="flex-between" style="padding:10px;background:var(--elevated);border-radius:var(--radius);margin-bottom:6px">
+        <div>
+          <div style="font-family:var(--font-display);font-size:12px;font-weight:600;margin-bottom:2px">${q.title}</div>
+          <div class="text-mono text-xs text-dim">${q.type} · +${q.xp}xp</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="completeQuest('${q.id}');renderDashboard()">✓</button>
+      </div>`).join('');
+  }
+
+  initCal();
 }
 
-let xpChartInstance = null;
-function renderXPChart() {
-  const canvas = document.getElementById('xpChart');
-  if (!canvas) return;
-  if (xpChartInstance) xpChartInstance.destroy();
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  xpChartInstance = new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels: days,
-      datasets: [{
-        label: 'XP', data: state.weeklyXP,
-        backgroundColor: days.map((_,i) => i === new Date().getDay() ? 'rgba(0,245,255,0.6)' : 'rgba(0,128,255,0.3)'),
-        borderColor: days.map((_,i) => i === new Date().getDay() ? '#00f5ff' : '#0080ff'),
-        borderWidth: 1, borderRadius: 3
-      }]
-    },
-    options: chartDefaults({ label:'XP' })
-  });
-}
+// ═══════════════════════════════════════════════════════════════
+//  CHART DEFAULTS
+// ═══════════════════════════════════════════════════════════════
 
-function chartDefaults({ max, label } = {}) {
+function chartOpts({ max, label, noLegend } = {}) {
   return {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display:false } },
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: !noLegend, labels: { color:'#9994c4', font:{family:'JetBrains Mono',size:10} } }
+    },
     scales: {
-      x: { grid: { color:'rgba(255,255,255,0.03)' }, ticks: { color:'#7090b0', font:{ family:'Share Tech Mono', size:10 } } },
-      y: { grid: { color:'rgba(255,255,255,0.03)' }, ticks: { color:'#7090b0', font:{ family:'Share Tech Mono', size:10 }, callback: v => max ? v+'%' : v }, max: max||undefined }
+      x: { grid:{color:'rgba(255,255,255,0.03)'}, ticks:{color:'#5c5880',font:{family:'JetBrains Mono',size:9}} },
+      y: { grid:{color:'rgba(255,255,255,0.03)'}, ticks:{color:'#5c5880',font:{family:'JetBrains Mono',size:9},callback:v=>max?v+'%':v}, max:max||undefined }
     }
   };
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 //  RENDER ALL
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
 function renderAll() {
   renderDashboard();
-  renderTasks();
+  renderDaily();
   renderStudy();
   renderGym();
   renderDiet();
   renderQuests();
 }
 
-// ═══════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════════════
 
-function addDefaultTasks() {
-  if (state.tasks.length === 0) {
-    const today = new Date().toDateString();
-    const defaults = [
-      { name:'Complete 1 Study Topic', cat:'study', xp:10 },
-      { name:'Revise Previous Notes', cat:'study', xp:10 },
-      { name:'Push/Pull/Legs Session', cat:'gym', xp:15 },
-      { name:'Hit Protein Goal', cat:'diet', xp:10 },
-      { name:'Drink 3L Water', cat:'diet', xp:10 },
-      { name:'Work on Project 30min', cat:'project', xp:12 },
-    ];
-    defaults.forEach(d => state.tasks.push({ id: Date.now()+Math.random(), ...d, done:false, date:today }));
-    save();
-  }
-}
-
-checkDate();
-addDefaultTasks();
-renderAll();
-
-// Keyboard shortcut to navigate
 document.addEventListener('keydown', e => {
+  if (!CU) return;
   if (e.altKey) {
-    const keys = { '1':'dashboard', '2':'daily', '3':'study', '4':'gym', '5':'diet', '6':'quests' };
-    if (keys[e.key]) { e.preventDefault(); showSection(keys[e.key]); }
+    const map = {'1':'dashboard','2':'daily','3':'study','4':'gym','5':'diet','6':'quests','7':'analytics'};
+    if (map[e.key]) { e.preventDefault(); nav(map[e.key]); }
+  }
+  if (e.key==='Escape') {
+    document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+    closeLevelUp();
   }
 });
+
+// Enter key on auth forms
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('reg-pass').addEventListener('keydown', e => { if(e.key==='Enter') doRegister(); });
+
+// ═══════════════════════════════════════════════════════════════
+//  AUTO LOGIN (if only 1 user exists and was recently active)
+// ═══════════════════════════════════════════════════════════════
+
+(function autoLogin() {
+  const session = sessionStorage.getItem('nexus_session');
+  if (session) {
+    const users = loadUsers();
+    if (users[session]) startSession(session);
+  }
+})();
+
+// Save session on login
+const origStartSession = startSession;
+window.startSession = function(u) {
+  sessionStorage.setItem('nexus_session', u);
+  origStartSession(u);
+};
+
+window.doLogout = function() {
+  saveState();
+  sessionStorage.removeItem('nexus_session');
+  CU = null; S = null;
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+};
 </script>
 </body>
 </html>
